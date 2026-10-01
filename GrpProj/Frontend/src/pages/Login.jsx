@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import BackgroundEffects from '../components/BackgroundEffects'
 import '../styles/auth.css'
-import { sendMagicLink } from '../lib/api'
+import { sendMagicLink } from '../api'
 
 export default function Login({ navigate }){
   const [email, setEmail] = useState('')
