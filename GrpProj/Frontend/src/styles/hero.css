@@ -1,0 +1,35 @@
+.hero-outer{min-height:760px;display:flex;align-items:center;justify-content:center;padding:40px 24px;position:relative}
+.hero-content{z-index:10;max-width:980px;text-align:center}
+.hero-top-label{color:var(--accent);font-weight:600;font-size:13px;letter-spacing:1px;margin-bottom:18px}
+.hero-heading{font-family:'Playfair Display', serif;font-size:72px;line-height:0.95;margin:0;color:var(--text-primary);font-style:italic;font-weight:400}
+.hero-heading .accent{color:var(--accent)}
+.hero-desc{color:var(--text-secondary);margin-top:20px;font-size:17px;line-height:1.6;max-width:640px;margin-left:auto;margin-right:auto}
+.hero-ctas{display:flex;gap:14px;justify-content:center;margin-top:30px}
+.cpb-button{border:0;padding:12px 20px;border-radius:10px;cursor:pointer;font-weight:600}
+.cpb-button--primary{background:linear-gradient(180deg,var(--accent),#232ba8);color:white;box-shadow:0 6px 30px rgba(255,49,88,0.12);transition:transform .18s,box-shadow .18s}
+.cpb-button--primary:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(255,49,88,0.14)}
+.cpb-button--ghost{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);color:var(--text-primary)}
+
+.hero-stats{display:flex;gap:40px;justify-content:center;margin-top:56px;margin-bottom:20px}
+.hero-stats .stat{min-width:110px}
+.stat-number{font-size:28px;font-weight:600;color:var(--text-primary)}
+.stat-label{font-size:13px;color:var(--text-secondary);margin-top:6px}
+
+@media (max-width:992px){
+  .hero-heading{font-size:52px}
+}
+@media (max-width:480px){
+  .hero-heading{font-size:40px}
+  .hero-ctas{flex-direction:column}
+  .hero-stats{flex-wrap:wrap;gap:22px}
+  .hero-stats .stat{flex:1 1 45%}
+}
+
+/* subtle entrance animations */
+.hero-top-label,.hero-heading,.hero-desc,.hero-ctas,.hero-stats{opacity:0;transform:translateY(8px);animation:fadeUp .8s ease forwards}
+.hero-top-label{animation-delay:.15s}
+.hero-heading{animation-delay:.25s}
+.hero-desc{animation-delay:.35s}
+.hero-ctas{animation-delay:.45s}
+.hero-stats{animation-delay:.55s}
+@keyframes fadeUp{to{opacity:1;transform:none}}

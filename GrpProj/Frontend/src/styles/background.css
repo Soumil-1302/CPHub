@@ -1,0 +1,10 @@
+.bg-effects{position:absolute;inset:0;overflow:hidden;z-index:0}
+.bg-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.55),rgba(0,0,0,0.75));pointer-events:none}
+.bg-shape{position:absolute;right:-10%;top:-10%;width:1400px;height:700px;transform:rotate(25deg);filter:blur(60px);opacity:.6}
+.bg-shape.shape-1{background:linear-gradient(135deg, rgba(255,49,88,0.12), rgba(120,20,30,0.06));top:-20%;right:-30%;}
+.bg-shape.shape-2{background:linear-gradient(135deg, rgba(120,20,200,0.06), rgba(20,30,80,0.06));top:10%;right:-40%;transform:rotate(20deg);opacity:.45}
+.bg-shape.shape-3{background:linear-gradient(135deg, rgba(255,49,88,0.08), rgba(0,0,0,0.02));top:40%;right:-20%;transform:rotate(15deg);opacity:.5}
+
+/* very slow drift */
+.bg-shape{animation:drift 28s linear infinite}
+@keyframes drift{0%{transform:translateX(0) rotate(20deg)}50%{transform:translateX(-30px) rotate(18deg)}100%{transform:translateX(0) rotate(20deg)}}

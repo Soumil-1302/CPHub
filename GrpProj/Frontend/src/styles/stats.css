@@ -1,0 +1,9 @@
+.cpb-stats{display:flex;gap:48px;justify-content:center;margin-top:36px}
+.cpb-stat{min-width:120px;text-align:center}
+.cpb-stat__num{font-size:30px;font-weight:600}
+.cpb-stat__label{font-size:13px;color:var(--text-secondary);margin-top:6px}
+
+@media (max-width:480px){
+  .cpb-stats{flex-wrap:wrap;gap:20px}
+  .cpb-stat{flex:1 1 45%}
+}
