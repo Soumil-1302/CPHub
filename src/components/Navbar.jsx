@@ -13,7 +13,7 @@ function Icon({ name, className = '' }) {
   return icons[name] || null
 }
 
-export default function Navbar({ onNavigate }) {
+export default function Navbar({ onNavigate, currentPath = '/' }) {
   const [open] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
 
@@ -29,10 +29,10 @@ export default function Navbar({ onNavigate }) {
         </div>
 
         <nav className={`cpb-nav__center ${open ? 'open' : ''}`}>
-          <button className="cpb-nav-link" onClick={() => handleNavigate('/leaderboard')}> <Icon name="trophy" /> <span>Leaderboard</span></button>
-          <button className="cpb-nav-link" onClick={() => handleNavigate('/rankings')}> <Icon name="bolt" /> <span>CP Rankings</span></button>
-          <button className="cpb-nav-link" onClick={() => handleNavigate('/contests')}> <Icon name="calendar" /> <span>Contests</span></button>
-          <button className="cpb-nav-link" onClick={() => handleNavigate('/dashboard')}> <Icon name="grid" /> <span>Dashboard</span></button>
+          <button className={`cpb-nav-link ${currentPath === '/leaderboard' ? 'active' : ''}`} onClick={() => handleNavigate('/leaderboard')}> <Icon name="trophy" /> <span>Leaderboard</span></button>
+          <button className={`cpb-nav-link ${currentPath === '/rankings' ? 'active' : ''}`} onClick={() => handleNavigate('/rankings')}> <Icon name="bolt" /> <span>CP Rankings</span></button>
+          <button className={`cpb-nav-link ${currentPath === '/contests' ? 'active' : ''}`} onClick={() => handleNavigate('/contests')}> <Icon name="calendar" /> <span>Contests</span></button>
+          <button className={`cpb-nav-link ${currentPath === '/dashboard' ? 'active' : ''}`} onClick={() => handleNavigate('/dashboard')}> <Icon name="grid" /> <span>Dashboard</span></button>
         </nav>
 
         <div className="cpb-nav__right">

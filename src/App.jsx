@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Home from './pages/Home'
 import Login from './pages/Login'
+import Leaderboard from './pages/Leaderboard'
 import './styles/global.css'
 
 function PagePlaceholder({ title, navigate }) {
@@ -36,7 +37,7 @@ export default function App() {
 
   if(path === '/login') return <Login navigate={navigate} />
 
-  if(path === '/leaderboard') return <PagePlaceholder title="Leaderboard" navigate={navigate} />
+  if(path === '/leaderboard') return <Leaderboard navigate={navigate} />
   if(path === '/dashboard') return <PagePlaceholder title="Dashboard" navigate={navigate} />
   if(path === '/contests') return <PagePlaceholder title="Contests" navigate={navigate} />
   if(path === '/rankings') return <PagePlaceholder title="CP Rankings" navigate={navigate} />

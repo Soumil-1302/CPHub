@@ -1,0 +1,14 @@
+{
+    "branch": {
+        "ct": "CST",
+        "am": "AI&ML",
+        "cy": "CYBER",
+        "cs": "CSE",
+        "ad": "AI&DS",
+        "ds": "DataSci",
+        "ec": "ECE",
+        "ra": "ROBOTICS",
+        "as": "AEROSPACE",
+        "me": "MECH"
+    }
+}

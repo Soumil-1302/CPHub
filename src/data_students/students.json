@@ -1,0 +1,902 @@
+{
+    "eng25ct0060": {
+        "name": "Aarav Sharma",
+        "username": "aarav_codes",
+        "year": "2025-2029",
+        "branch": "CST",
+        "leetcode": 542,
+        "codeforces": 381,
+        "total": 923
+    },
+    "eng24cs0061": {
+        "name": "Ananya Rao",
+        "username": "ananya_dev",
+        "year": "2024-2028",
+        "branch": "CSE",
+        "leetcode": 615,
+        "codeforces": 427,
+        "total": 1042
+    },
+    "eng23am0062": {
+        "name": "Rohan Mehta",
+        "username": "rohan_codes",
+        "year": "2023-2027",
+        "branch": "AI&ML",
+        "leetcode": 348,
+        "codeforces": 295,
+        "total": 643
+    },
+    "eng22cy0063": {
+        "name": "Ishita Nair",
+        "username": "ishita_byte",
+        "year": "2022-2026",
+        "branch": "CYBER",
+        "leetcode": 487,
+        "codeforces": 352,
+        "total": 839
+    },
+    "eng25ad0064": {
+        "name": "Vihaan Kapoor",
+        "username": "vihaan_dev",
+        "year": "2025-2029",
+        "branch": "AI&DS",
+        "leetcode": 271,
+        "codeforces": 198,
+        "total": 469
+    },
+    "eng24ds0065": {
+        "name": "Diya Menon",
+        "username": "diya_codes",
+        "year": "2024-2028",
+        "branch": "DataSci",
+        "leetcode": 589,
+        "codeforces": 416,
+        "total": 1005
+    },
+    "eng23ec0066": {
+        "name": "Arjun Verma",
+        "username": "arjun_logic",
+        "year": "2023-2027",
+        "branch": "ECE",
+        "leetcode": 183,
+        "codeforces": 241,
+        "total": 424
+    },
+    "eng22ra0067": {
+        "name": "Meera Iyer",
+        "username": "meera_tech",
+        "year": "2022-2026",
+        "branch": "ROBOTICS",
+        "leetcode": 634,
+        "codeforces": 522,
+        "total": 1156
+    },
+    "eng25as0068": {
+        "name": "Karan Singh",
+        "username": "karan_coder",
+        "year": "2025-2029",
+        "branch": "AEROSPACE",
+        "leetcode": 326,
+        "codeforces": 174,
+        "total": 500
+    },
+    "eng24me0069": {
+        "name": "Sneha Joshi",
+        "username": "sneha_dev",
+        "year": "2024-2028",
+        "branch": "MECH",
+        "leetcode": 412,
+        "codeforces": 287,
+        "total": 699
+    },
+    "eng23ct0070": {
+        "name": "Aditya Kumar",
+        "username": "aditya_algo",
+        "year": "2023-2027",
+        "branch": "CST",
+        "leetcode": 657,
+        "codeforces": 614,
+        "total": 1271
+    },
+    "eng22cs0071": {
+        "name": "Nisha Patel",
+        "username": "nisha_codes",
+        "year": "2022-2026",
+        "branch": "CSE",
+        "leetcode": 521,
+        "codeforces": 438,
+        "total": 959
+    },
+    "eng25am0072": {
+        "name": "Kabir Shah",
+        "username": "kabir_dev",
+        "year": "2025-2029",
+        "branch": "AI&ML",
+        "leetcode": 296,
+        "codeforces": 351,
+        "total": 647
+    },
+    "eng24cy0073": {
+        "name": "Pooja Reddy",
+        "username": "pooja_coder",
+        "year": "2024-2028",
+        "branch": "CYBER",
+        "leetcode": 447,
+        "codeforces": 209,
+        "total": 656
+    },
+    "eng23ad0074": {
+        "name": "Rahul Das",
+        "username": "rahul_byte",
+        "year": "2023-2027",
+        "branch": "AI&DS",
+        "leetcode": 378,
+        "codeforces": 462,
+        "total": 840
+    },
+    "eng22ds0075": {
+        "name": "Aditi Malhotra",
+        "username": "aditi_algo",
+        "year": "2022-2026",
+        "branch": "DataSci",
+        "leetcode": 689,
+        "codeforces": 574,
+        "total": 1263
+    },
+    "eng25ec0076": {
+        "name": "Manav Gupta",
+        "username": "manav_codes",
+        "year": "2025-2029",
+        "branch": "ECE",
+        "leetcode": 218,
+        "codeforces": 163,
+        "total": 381
+    },
+    "eng24ra0077": {
+        "name": "Tanya Sinha",
+        "username": "tanya_dev",
+        "year": "2024-2028",
+        "branch": "ROBOTICS",
+        "leetcode": 536,
+        "codeforces": 448,
+        "total": 984
+    },
+    "eng23as0078": {
+        "name": "Yash Agarwal",
+        "username": "yash_codes",
+        "year": "2023-2027",
+        "branch": "AEROSPACE",
+        "leetcode": 165,
+        "codeforces": 277,
+        "total": 442
+    },
+    "eng22me0079": {
+        "name": "Kavya N",
+        "username": "kavya_logic",
+        "year": "2022-2026",
+        "branch": "MECH",
+        "leetcode": 493,
+        "codeforces": 328,
+        "total": 821
+    },
+    "eng25ct0080": {
+        "name": "Siddharth Jain",
+        "username": "sid_codes",
+        "year": "2025-2029",
+        "branch": "CST",
+        "leetcode": 602,
+        "codeforces": 671,
+        "total": 1273
+    },
+    "eng24cs0081": {
+        "name": "Riya Kapoor",
+        "username": "riya_dev",
+        "year": "2024-2028",
+        "branch": "CSE",
+        "leetcode": 459,
+        "codeforces": 384,
+        "total": 843
+    },
+    "eng23am0082": {
+        "name": "Aman Roy",
+        "username": "aman_codes",
+        "year": "2023-2027",
+        "branch": "AI&ML",
+        "leetcode": 314,
+        "codeforces": 226,
+        "total": 540
+    },
+    "eng22cy0083": {
+        "name": "Shreya Bhat",
+        "username": "shreya_byte",
+        "year": "2022-2026",
+        "branch": "CYBER",
+        "leetcode": 571,
+        "codeforces": 493,
+        "total": 1064
+    },
+    "eng25ad0084": {
+        "name": "Harsh Vardhan",
+        "username": "harsh_algo",
+        "year": "2025-2029",
+        "branch": "AI&DS",
+        "leetcode": 205,
+        "codeforces": 189,
+        "total": 394
+    },
+    "eng24ds0085": {
+        "name": "Neha Sharma",
+        "username": "neha_codes",
+        "year": "2024-2028",
+        "branch": "DataSci",
+        "leetcode": 523,
+        "codeforces": 367,
+        "total": 890
+    },
+    "eng23ec0086": {
+        "name": "Akash Yadav",
+        "username": "akash_dev",
+        "year": "2023-2027",
+        "branch": "ECE",
+        "leetcode": 187,
+        "codeforces": 302,
+        "total": 489
+    },
+    "eng22ra0087": {
+        "name": "Lavanya Rao",
+        "username": "lavanya_codes",
+        "year": "2022-2026",
+        "branch": "ROBOTICS",
+        "leetcode": 641,
+        "codeforces": 583,
+        "total": 1224
+    },
+    "eng25as0088": {
+        "name": "Nikhil R",
+        "username": "nikhil_coder",
+        "year": "2025-2029",
+        "branch": "AEROSPACE",
+        "leetcode": 278,
+        "codeforces": 315,
+        "total": 593
+    },
+    "eng24me0089": {
+        "name": "Sanjana Iyer",
+        "username": "sanjana_dev",
+        "year": "2024-2028",
+        "branch": "MECH",
+        "leetcode": 396,
+        "codeforces": 247,
+        "total": 643
+    },
+    "eng23ct0090": {
+        "name": "Dev Malhotra",
+        "username": "dev_codes",
+        "year": "2023-2027",
+        "branch": "CST",
+        "leetcode": 678,
+        "codeforces": 645,
+        "total": 1323
+    },
+    "eng22cs0091": {
+        "name": "Maya Thomas",
+        "username": "maya_algo",
+        "year": "2022-2026",
+        "branch": "CSE",
+        "leetcode": 489,
+        "codeforces": 521,
+        "total": 1010
+    },
+    "eng25am0092": {
+        "name": "Varun Shetty",
+        "username": "varun_codes",
+        "year": "2025-2029",
+        "branch": "AI&ML",
+        "leetcode": 346,
+        "codeforces": 278,
+        "total": 624
+    },
+    "eng24cy0093": {
+        "name": "Keerthi Gowda",
+        "username": "keerthi_dev",
+        "year": "2024-2028",
+        "branch": "CYBER",
+        "leetcode": 418,
+        "codeforces": 361,
+        "total": 779
+    },
+    "eng23ad0094": {
+        "name": "Ritesh Kumar",
+        "username": "ritesh_logic",
+        "year": "2023-2027",
+        "branch": "AI&DS",
+        "leetcode": 562,
+        "codeforces": 497,
+        "total": 1059
+    },
+    "eng22ds0095": {
+        "name": "Sakshi Jain",
+        "username": "sakshi_codes",
+        "year": "2022-2026",
+        "branch": "DataSci",
+        "leetcode": 154,
+        "codeforces": 219,
+        "total": 373
+    },
+    "eng25ec0096": {
+        "name": "Mohit S",
+        "username": "mohit_dev",
+        "year": "2025-2029",
+        "branch": "ECE",
+        "leetcode": 373,
+        "codeforces": 286,
+        "total": 659
+    },
+    "eng24ra0097": {
+        "name": "Anika Das",
+        "username": "anika_codes",
+        "year": "2024-2028",
+        "branch": "ROBOTICS",
+        "leetcode": 588,
+        "codeforces": 436,
+        "total": 1024
+    },
+    "eng23as0098": {
+        "name": "Vivek Nair",
+        "username": "vivek_algo",
+        "year": "2023-2027",
+        "branch": "AEROSPACE",
+        "leetcode": 241,
+        "codeforces": 193,
+        "total": 434
+    },
+    "eng22me0099": {
+        "name": "Nandini Rao",
+        "username": "nandini_dev",
+        "year": "2022-2026",
+        "branch": "MECH",
+        "leetcode": 427,
+        "codeforces": 339,
+        "total": 766
+    },
+    "eng25ct0100": {
+        "name": "Karthik M",
+        "username": "karthik_codes",
+        "year": "2025-2029",
+        "branch": "CST",
+        "leetcode": 647,
+        "codeforces": 612,
+        "total": 1259
+    },
+    "eng24cs0101": {
+        "name": "Swati Kulkarni",
+        "username": "swati_dev",
+        "year": "2024-2028",
+        "branch": "CSE",
+        "leetcode": 382,
+        "codeforces": 449,
+        "total": 831
+    },
+    "eng23am0102": {
+        "name": "Arnav Mehta",
+        "username": "arnav_algo",
+        "year": "2023-2027",
+        "branch": "AI&ML",
+        "leetcode": 298,
+        "codeforces": 314,
+        "total": 612
+    },
+    "eng22cy0103": {
+        "name": "Preeti Shah",
+        "username": "preeti_codes",
+        "year": "2022-2026",
+        "branch": "CYBER",
+        "leetcode": 596,
+        "codeforces": 544,
+        "total": 1140
+    },
+    "eng25ad0104": {
+        "name": "Abhinav Joshi",
+        "username": "abhinav_dev",
+        "year": "2025-2029",
+        "branch": "AI&DS",
+        "leetcode": 361,
+        "codeforces": 285,
+        "total": 646
+    },
+    "eng24ds0105": {
+        "name": "Pallavi N",
+        "username": "pallavi_codes",
+        "year": "2024-2028",
+        "branch": "DataSci",
+        "leetcode": 504,
+        "codeforces": 398,
+        "total": 902
+    },
+    "eng23ec0106": {
+        "name": "Raghav Singh",
+        "username": "raghav_logic",
+        "year": "2023-2027",
+        "branch": "ECE",
+        "leetcode": 229,
+        "codeforces": 176,
+        "total": 405
+    },
+    "eng22ra0107": {
+        "name": "Isha Kapoor",
+        "username": "isha_dev",
+        "year": "2022-2026",
+        "branch": "ROBOTICS",
+        "leetcode": 617,
+        "codeforces": 559,
+        "total": 1176
+    },
+    "eng25as0108": {
+        "name": "Tarun Rao",
+        "username": "tarun_codes",
+        "year": "2025-2029",
+        "branch": "AEROSPACE",
+        "leetcode": 287,
+        "codeforces": 342,
+        "total": 629
+    },
+    "eng24me0109": {
+        "name": "Pavithra S",
+        "username": "pavithra_algo",
+        "year": "2024-2028",
+        "branch": "MECH",
+        "leetcode": 415,
+        "codeforces": 267,
+        "total": 682
+    },
+    "eng23ct0110": {
+        "name": "Omkar Patil",
+        "username": "omkar_codes",
+        "year": "2023-2027",
+        "branch": "CST",
+        "leetcode": 693,
+        "codeforces": 628,
+        "total": 1321
+    },
+    "eng22cs0111": {
+        "name": "Shruti Reddy",
+        "username": "shruti_dev",
+        "year": "2022-2026",
+        "branch": "CSE",
+        "leetcode": 534,
+        "codeforces": 487,
+        "total": 1021
+    },
+    "eng25am0112": {
+        "name": "Dhruv Agarwal",
+        "username": "dhruv_algo",
+        "year": "2025-2029",
+        "branch": "AI&ML",
+        "leetcode": 319,
+        "codeforces": 251,
+        "total": 570
+    },
+    "eng24cy0113": {
+        "name": "Ayesha Khan",
+        "username": "ayesha_codes",
+        "year": "2024-2028",
+        "branch": "CYBER",
+        "leetcode": 572,
+        "codeforces": 436,
+        "total": 1008
+    },
+    "eng23ad0114": {
+        "name": "Suresh Kumar",
+        "username": "suresh_dev",
+        "year": "2023-2027",
+        "branch": "AI&DS",
+        "leetcode": 198,
+        "codeforces": 225,
+        "total": 423
+    },
+    "eng22ds0115": {
+        "name": "Harini V",
+        "username": "harini_codes",
+        "year": "2022-2026",
+        "branch": "DataSci",
+        "leetcode": 621,
+        "codeforces": 519,
+        "total": 1140
+    },
+    "eng25ec0116": {
+        "name": "Sahil Verma",
+        "username": "sahil_logic",
+        "year": "2025-2029",
+        "branch": "ECE",
+        "leetcode": 267,
+        "codeforces": 194,
+        "total": 461
+    },
+    "eng24ra0117": {
+        "name": "Roshni Menon",
+        "username": "roshni_dev",
+        "year": "2024-2028",
+        "branch": "ROBOTICS",
+        "leetcode": 548,
+        "codeforces": 603,
+        "total": 1151
+    },
+    "eng23as0118": {
+        "name": "Naveen R",
+        "username": "naveen_codes",
+        "year": "2023-2027",
+        "branch": "AEROSPACE",
+        "leetcode": 176,
+        "codeforces": 263,
+        "total": 439
+    },
+    "eng22me0119": {
+        "name": "Deepika Rao",
+        "username": "deepika_algo",
+        "year": "2022-2026",
+        "branch": "MECH",
+        "leetcode": 459,
+        "codeforces": 372,
+        "total": 831
+    },
+    "eng25ct0120": {
+        "name": "Shreyas Gowda",
+        "username": "shreyas_codes",
+        "year": "2025-2029",
+        "branch": "CST",
+        "leetcode": 625,
+        "codeforces": 689,
+        "total": 1314
+    },
+    "eng24cs0121": {
+        "name": "Madhuri S",
+        "username": "madhuri_dev",
+        "year": "2024-2028",
+        "branch": "CSE",
+        "leetcode": 441,
+        "codeforces": 382,
+        "total": 823
+    },
+    "eng23am0122": {
+        "name": "Yuvraj Singh",
+        "username": "yuvraj_codes",
+        "year": "2023-2027",
+        "branch": "AI&ML",
+        "leetcode": 357,
+        "codeforces": 298,
+        "total": 655
+    },
+    "eng22cy0123": {
+        "name": "Rhea Mathew",
+        "username": "rhea_algo",
+        "year": "2022-2026",
+        "branch": "CYBER",
+        "leetcode": 603,
+        "codeforces": 511,
+        "total": 1114
+    },
+    "eng25ad0124": {
+        "name": "Ashwin Kumar",
+        "username": "ashwin_dev",
+        "year": "2025-2029",
+        "branch": "AI&DS",
+        "leetcode": 243,
+        "codeforces": 317,
+        "total": 560
+    },
+    "eng24ds0125": {
+        "name": "Nitya Sharma",
+        "username": "nitya_codes",
+        "year": "2024-2028",
+        "branch": "DataSci",
+        "leetcode": 568,
+        "codeforces": 427,
+        "total": 995
+    },
+    "eng23ec0126": {
+        "name": "Rohit B",
+        "username": "rohit_algo",
+        "year": "2023-2027",
+        "branch": "ECE",
+        "leetcode": 154,
+        "codeforces": 203,
+        "total": 357
+    },
+    "eng22ra0127": {
+        "name": "Aishwarya N",
+        "username": "aishwarya_dev",
+        "year": "2022-2026",
+        "branch": "ROBOTICS",
+        "leetcode": 579,
+        "codeforces": 617,
+        "total": 1196
+    },
+    "eng25as0128": {
+        "name": "Chetan Shetty",
+        "username": "chetan_codes",
+        "year": "2025-2029",
+        "branch": "AEROSPACE",
+        "leetcode": 302,
+        "codeforces": 271,
+        "total": 573
+    },
+    "eng24me0129": {
+        "name": "Reshma K",
+        "username": "reshma_dev",
+        "year": "2024-2028",
+        "branch": "MECH",
+        "leetcode": 391,
+        "codeforces": 318,
+        "total": 709
+    },
+    "eng23ct0130": {
+        "name": "Vishal Jain",
+        "username": "vishal_codes",
+        "year": "2023-2027",
+        "branch": "CST",
+        "leetcode": 664,
+        "codeforces": 601,
+        "total": 1265
+    },
+    "eng22cs0131": {
+        "name": "Tanvi Rao",
+        "username": "tanvi_dev",
+        "year": "2022-2026",
+        "branch": "CSE",
+        "leetcode": 492,
+        "codeforces": 536,
+        "total": 1028
+    },
+    "eng25am0132": {
+        "name": "Kunal Mehta",
+        "username": "kunal_algo",
+        "year": "2025-2029",
+        "branch": "AI&ML",
+        "leetcode": 276,
+        "codeforces": 321,
+        "total": 597
+    },
+    "eng24cy0133": {
+        "name": "Simran Kaur",
+        "username": "simran_codes",
+        "year": "2024-2028",
+        "branch": "CYBER",
+        "leetcode": 453,
+        "codeforces": 391,
+        "total": 844
+    },
+    "eng23ad0134": {
+        "name": "Pranav Rao",
+        "username": "pranav_dev",
+        "year": "2023-2027",
+        "branch": "AI&DS",
+        "leetcode": 337,
+        "codeforces": 276,
+        "total": 613
+    },
+    "eng22ds0135": {
+        "name": "Bhavana S",
+        "username": "bhavana_codes",
+        "year": "2022-2026",
+        "branch": "DataSci",
+        "leetcode": 611,
+        "codeforces": 574,
+        "total": 1185
+    },
+    "eng25ec0136": {
+        "name": "Nithin Kumar",
+        "username": "nithin_logic",
+        "year": "2025-2029",
+        "branch": "ECE",
+        "leetcode": 184,
+        "codeforces": 229,
+        "total": 413
+    },
+    "eng24ra0137": {
+        "name": "Sowmya R",
+        "username": "sowmya_dev",
+        "year": "2024-2028",
+        "branch": "ROBOTICS",
+        "leetcode": 507,
+        "codeforces": 468,
+        "total": 975
+    },
+    "eng23as0138": {
+        "name": "Manish Verma",
+        "username": "manish_codes",
+        "year": "2023-2027",
+        "branch": "AEROSPACE",
+        "leetcode": 219,
+        "codeforces": 188,
+        "total": 407
+    },
+    "eng22me0139": {
+        "name": "Pooja Nair",
+        "username": "pooja_algo",
+        "year": "2022-2026",
+        "branch": "MECH",
+        "leetcode": 436,
+        "codeforces": 352,
+        "total": 788
+    },
+    "eng25ct0140": {
+        "name": "Akhil Raj",
+        "username": "akhil_codes",
+        "year": "2025-2029",
+        "branch": "CST",
+        "leetcode": 699,
+        "codeforces": 653,
+        "total": 1352
+    },
+    "eng24cs0141": {
+        "name": "Sahana Rao",
+        "username": "sahana_dev",
+        "year": "2024-2028",
+        "branch": "CSE",
+        "leetcode": 416,
+        "codeforces": 503,
+        "total": 919
+    },
+    "eng23am0142": {
+        "name": "Tejas Patil",
+        "username": "tejas_algo",
+        "year": "2023-2027",
+        "branch": "AI&ML",
+        "leetcode": 382,
+        "codeforces": 244,
+        "total": 626
+    },
+    "eng22cy0143": {
+        "name": "Anushka Das",
+        "username": "anushka_codes",
+        "year": "2022-2026",
+        "branch": "CYBER",
+        "leetcode": 577,
+        "codeforces": 641,
+        "total": 1218
+    },
+    "eng25ad0144": {
+        "name": "Gaurav Singh",
+        "username": "gaurav_dev",
+        "year": "2025-2029",
+        "branch": "AI&DS",
+        "leetcode": 263,
+        "codeforces": 294,
+        "total": 557
+    },
+    "eng24ds0145": {
+        "name": "Manya Kapoor",
+        "username": "manya_codes",
+        "year": "2024-2028",
+        "branch": "DataSci",
+        "leetcode": 546,
+        "codeforces": 389,
+        "total": 935
+    },
+    "eng23ec0146": {
+        "name": "Sanjay Rao",
+        "username": "sanjay_algo",
+        "year": "2023-2027",
+        "branch": "ECE",
+        "leetcode": 207,
+        "codeforces": 154,
+        "total": 361
+    },
+    "eng22ra0147": {
+        "name": "Navya Shetty",
+        "username": "navya_dev",
+        "year": "2022-2026",
+        "branch": "ROBOTICS",
+        "leetcode": 612,
+        "codeforces": 596,
+        "total": 1208
+    },
+    "eng25as0148": {
+        "name": "Rakesh Kumar",
+        "username": "rakesh_codes",
+        "year": "2025-2029",
+        "branch": "AEROSPACE",
+        "leetcode": 294,
+        "codeforces": 226,
+        "total": 520
+    },
+    "eng24me0149": {
+        "name": "Chandana R",
+        "username": "chandana_algo",
+        "year": "2024-2028",
+        "branch": "MECH",
+        "leetcode": 367,
+        "codeforces": 311,
+        "total": 678
+    },
+    "eng23ct0150": {
+        "name": "Adarsh Kumar",
+        "username": "adarsh_codes",
+        "year": "2023-2027",
+        "branch": "CST",
+        "leetcode": 638,
+        "codeforces": 677,
+        "total": 1315
+    },
+    "eng22cs0151": {
+        "name": "Pooja Sharma",
+        "username": "pooja_dev",
+        "year": "2022-2026",
+        "branch": "CSE",
+        "leetcode": 528,
+        "codeforces": 412,
+        "total": 940
+    },
+    "eng25am0152": {
+        "name": "Naveen Shetty",
+        "username": "naveen_algo",
+        "year": "2025-2029",
+        "branch": "AI&ML",
+        "leetcode": 341,
+        "codeforces": 289,
+        "total": 630
+    },
+    "eng24cy0153": {
+        "name": "Ritika Jain",
+        "username": "ritika_codes",
+        "year": "2024-2028",
+        "branch": "CYBER",
+        "leetcode": 463,
+        "codeforces": 518,
+        "total": 981
+    },
+    "eng23ad0154": {
+        "name": "Abhishek R",
+        "username": "abhishek_dev",
+        "year": "2023-2027",
+        "branch": "AI&DS",
+        "leetcode": 226,
+        "codeforces": 183,
+        "total": 409
+    },
+    "eng22ds0155": {
+        "name": "Shalini Menon",
+        "username": "shalini_codes",
+        "year": "2022-2026",
+        "branch": "DataSci",
+        "leetcode": 594,
+        "codeforces": 621,
+        "total": 1215
+    },
+    "eng25ec0156": {
+        "name": "Vikram Nair",
+        "username": "vikram_algo",
+        "year": "2025-2029",
+        "branch": "ECE",
+        "leetcode": 173,
+        "codeforces": 218,
+        "total": 391
+    },
+    "eng24ra0157": {
+        "name": "Nandita Rao",
+        "username": "nandita_dev",
+        "year": "2024-2028",
+        "branch": "ROBOTICS",
+        "leetcode": 563,
+        "codeforces": 479,
+        "total": 1042
+    },
+    "eng23as0158": {
+        "name": "Suraj Patil",
+        "username": "suraj_codes",
+        "year": "2023-2027",
+        "branch": "AEROSPACE",
+        "leetcode": 305,
+        "codeforces": 271,
+        "total": 576
+    },
+    "eng22me0159": {
+        "name": "Keerthana S",
+        "username": "keerthana_algo",
+        "year": "2022-2026",
+        "branch": "MECH",
+        "leetcode": 481,
+        "codeforces": 367,
+        "total": 848
+    }
+}

@@ -5,6 +5,7 @@
 .cpb-nav__center{display:flex;gap:18px;align-items:center}
 .cpb-nav-link{background:none;border:0;color:var(--muted);padding:8px 10px;border-radius:8px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:color .18s,background .18s}
 .cpb-nav-link:hover{color:var(--text-primary)}
+.cpb-nav-link.active{color:var(--text-primary);background:rgba(255,255,255,0.06);font-weight:600}
 .icon-btn{background:transparent;border:0;color:var(--muted);padding:8px;margin-left:6px;border-radius:8px;cursor:pointer;position:relative}
 .icon-btn:hover{color:var(--text-primary)}
 .icon-btn.spin{animation:spin .7s ease}
