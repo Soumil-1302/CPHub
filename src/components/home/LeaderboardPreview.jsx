@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { ROUTES } from '../../constants/routes'
 
 export default function LeaderboardPreview({ students = [], onNavigate }) {
   const [selectedBranch, setSelectedBranch] = useState('ALL')
@@ -83,7 +84,12 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
               </thead>
               <tbody>
                 {filteredPreview.map((student) => (
-                  <tr key={student.username || student.rank}>
+                  <tr
+                    key={student.username || student.rank}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => onNavigate && onNavigate(ROUTES.profile(student.username))}
+                    title={`View profile of ${student.name} (@${student.username})`}
+                  >
                     <td style={{ textAlign: 'center' }}>
                       <span
                         className={`preview-rank-badge ${
@@ -146,11 +152,11 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
           {/* Table Footer with Full View CTA */}
           <div className="preview-footer">
             <span className="preview-footer-note">
-              Rankings recalculate instantly on new problem solves and verified contest ratings.
+              Rankings recalculate instantly on new problem solves and verified contest ratings. Click any student to view their detailed profile.
             </span>
             <button
               className="btn-preview-cta"
-              onClick={() => onNavigate && onNavigate('/leaderboard')}
+              onClick={() => onNavigate && onNavigate(ROUTES.LEADERBOARD)}
             >
               <span>View Full 100+ Leaderboard</span>
               <span aria-hidden="true">→</span>

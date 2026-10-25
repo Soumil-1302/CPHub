@@ -1,5 +1,4 @@
-/* Background effects are purely presentational; no React default import needed */
-import '../styles/background.css'
+import '../../styles/background.css'
 
 export default function BackgroundEffects() {
   return (

@@ -1,34 +1,28 @@
 import { useState, useMemo } from 'react'
-import studentsData from '../data_students/students.json'
-import branchesData from '../data_students/branches.json'
-import Navbar from '../components/Navbar'
-import BackgroundEffects from '../components/BackgroundEffects'
-import LeaderboardHeader from '../components/LeaderboardHeader'
-import LeaderboardFilters from '../components/LeaderboardFilters'
-import LeaderboardTable from '../components/LeaderboardTable'
+import studentsData from '../data/students.json'
+import branchesData from '../data/branches.json'
+import FloatingNavbar from '../components/layout/FloatingNavbar'
+import LeaderboardHeader from '../components/leaderboard/LeaderboardHeader'
+import LeaderboardPodium from '../components/leaderboard/LeaderboardPodium'
+import LeaderboardFilters from '../components/leaderboard/LeaderboardFilters'
+import LeaderboardTable from '../components/leaderboard/LeaderboardTable'
+import ClosingCTA from '../components/layout/ClosingCTA'
+import {
+  normalizeStudentsData,
+  getBranchList,
+  getYearOptions,
+  calculateCampusStats,
+  processLeaderboardStudents,
+} from '../utils/studentAnalytics'
 import '../styles/leaderboard.css'
 
-/**
- * Resolves a student's branch code or name to the human-readable branch name
- * using the mapping provided in branches.json.
- */
-function resolveBranchName(branchVal, branchMap) {
-  if (!branchVal) return 'General'
-  // If branchVal matches a key in branchMap (e.g. "ct" -> "CST", "cs" -> "CSE")
-  if (branchMap[branchVal]) return branchMap[branchVal]
-  // If branchVal is already one of the human-readable values (e.g. "CST")
-  const directMatch = Object.values(branchMap).find(
-    (name) => typeof name === 'string' && name.toLowerCase() === branchVal.toLowerCase()
-  )
-  if (directMatch) return directMatch
-  return branchVal
-}
-
 export default function Leaderboard({ navigate }) {
-  // Filter States
+  // Filter and Sorting States
   const [selectedBranch, setSelectedBranch] = useState('ALL')
   const [selectedYear, setSelectedYear] = useState('ALL')
   const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState('total')
+  const [sortOrder, setSortOrder] = useState('desc')
 
   // 1. Process branches map from branches.json
   const branchMap = useMemo(() => {
@@ -36,169 +30,116 @@ export default function Leaderboard({ navigate }) {
     return branchesData.branch || branchesData
   }, [])
 
-  // 2. Extract unique branch options for filtering (derived from branches.json)
+  // 2. Extract unique branch options for filtering
   const branchOptions = useMemo(() => {
-    const rawNames = Object.values(branchMap)
-    return Array.from(new Set(rawNames.filter(Boolean)))
-  }, [branchMap])
+    return getBranchList(branchesData)
+  }, [])
 
   // 3. Normalize students data whether imported as an array or object keyed by USN
   const studentsList = useMemo(() => {
-    if (!studentsData) return []
-    if (Array.isArray(studentsData)) return studentsData
-    if (typeof studentsData === 'object') {
-      return Object.entries(studentsData).map(([key, val]) => ({
-        ...val,
-        id: val.username || key,
-      }))
-    }
-    return []
+    return normalizeStudentsData(studentsData)
   }, [])
 
-  // 4. Extract unique graduation batches/years (derived dynamically from student data)
+  // 4. Extract unique graduation batches/years
   const yearOptions = useMemo(() => {
-    const rawYears = studentsList
-      .map((s) => s.year)
-      .filter((y) => typeof y === 'string' && y.trim().length > 0)
-    // Sort descending so the most recent incoming batch appears first
-    return Array.from(new Set(rawYears)).sort((a, b) => b.localeCompare(a))
+    return getYearOptions(studentsList)
   }, [studentsList])
 
-  // 5. Overall metrics for the header
+  // 5. Overall campus metrics for the header
   const overallMetrics = useMemo(() => {
-    const totalStudents = studentsList.length
-    let totalSolved = 0
-    const branchesSet = new Set()
-
-    for (const s of studentsList) {
-      const lc = Math.max(0, Number(s.leetcode) || 0)
-      const cf = Math.max(0, Number(s.codeforces) || 0)
-      const calculatedTotal = lc + cf
-      const sTotal = Number.isFinite(s.total) && s.total >= calculatedTotal ? s.total : calculatedTotal
-      totalSolved += sTotal
-
-      const branchName = resolveBranchName(s.branch, branchMap)
-      if (branchName) branchesSet.add(branchName)
-    }
-
-    return {
-      totalStudents,
-      totalSolved,
-      activeBranchCount: branchesSet.size,
-    }
+    return calculateCampusStats(studentsList, branchMap)
   }, [studentsList, branchMap])
 
-  // 6. Filter and sort students, then recalculate 1-based ranks
+  // 6. Natural top 3 students overall (unfiltered) for the podium
+  const topStudents = useMemo(() => {
+    const allRanked = processLeaderboardStudents(studentsList, {}, branchMap)
+    return allRanked.slice(0, 3)
+  }, [studentsList, branchMap])
+
+  // 7. Filter, sort, and rank students according to active criteria
   const processedStudents = useMemo(() => {
-    // A. Filter students
-    const filtered = studentsList.filter((student) => {
-      const branchDisplay = resolveBranchName(student.branch, branchMap)
+    return processLeaderboardStudents(
+      studentsList,
+      { selectedBranch, selectedYear, searchQuery, sortBy, sortOrder },
+      branchMap
+    )
+  }, [studentsList, selectedBranch, selectedYear, searchQuery, sortBy, sortOrder, branchMap])
 
-      // Branch filter check
-      if (selectedBranch !== 'ALL' && branchDisplay !== selectedBranch) {
-        return false
-      }
+  // Sorting handlers
+  const handleSortChange = (columnKey) => {
+    if (sortBy === columnKey) {
+      setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))
+    } else {
+      setSortBy(columnKey)
+      setSortOrder('desc')
+    }
+  }
 
-      // Year filter check
-      if (selectedYear !== 'ALL' && student.year !== selectedYear) {
-        return false
-      }
-
-      // Search query check (search by username or name)
-      if (searchQuery.trim() !== '') {
-        const query = searchQuery.toLowerCase().trim()
-        const matchUser = (student.username || '').toLowerCase().includes(query)
-        const matchName = (student.name || '').toLowerCase().includes(query)
-        if (!matchUser && !matchName) return false
-      }
-
-      return true
-    })
-
-    // B. Calculate safe statistics for each student
-    const withStats = filtered.map((student) => {
-      const lc = Math.max(0, Number(student.leetcode) || 0)
-      const cf = Math.max(0, Number(student.codeforces) || 0)
-      const calculatedTotal = lc + cf
-      const total =
-        Number.isFinite(student.total) && student.total >= calculatedTotal
-          ? student.total
-          : calculatedTotal
-      const branchDisplay = resolveBranchName(student.branch, branchMap)
-
-      return {
-        ...student,
-        leetcode: lc,
-        codeforces: cf,
-        total,
-        branchDisplay,
-      }
-    })
-
-    // C. Sort by Total questions solved descending by default
-    withStats.sort((a, b) => {
-      if (b.total !== a.total) {
-        return b.total - a.total
-      }
-      // Tie breaker 1: LeetCode solved
-      if (b.leetcode !== a.leetcode) {
-        return b.leetcode - a.leetcode
-      }
-      // Tie breaker 2: Codeforces solved
-      if (b.codeforces !== a.codeforces) {
-        return b.codeforces - a.codeforces
-      }
-      // Tie breaker 3: alphabetical by name
-      return (a.name || '').localeCompare(b.name || '')
-    })
-
-    // D. Assign ranks automatically (1-indexed based on filtered/sorted results)
-    return withStats.map((student, index) => ({
-      ...student,
-      rank: index + 1,
-    }))
-  }, [studentsList, selectedBranch, selectedYear, searchQuery, branchMap])
+  const handleToggleSortOrder = () => {
+    setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))
+  }
 
   // Reset filters handler
   const handleResetFilters = () => {
     setSelectedBranch('ALL')
     setSelectedYear('ALL')
     setSearchQuery('')
+    setSortBy('total')
+    setSortOrder('desc')
   }
 
   return (
     <div className="leaderboard-page">
-      <Navbar onNavigate={navigate} currentPath="/leaderboard" />
-      <BackgroundEffects />
+      <FloatingNavbar onNavigate={navigate} currentPath="/leaderboard" />
 
       <main className="leaderboard-main">
-        <div className="container">
+        <div className="cphub-container">
           <LeaderboardHeader
             totalStudents={overallMetrics.totalStudents}
             totalSolved={overallMetrics.totalSolved}
+            totalLc={overallMetrics.totalLc}
+            totalCf={overallMetrics.totalCf}
             activeBranchCount={overallMetrics.activeBranchCount}
           />
 
+          {/* Podium section for Top 3 performers */}
+          <LeaderboardPodium
+            topStudents={topStudents}
+            onNavigate={navigate}
+          />
+
+          {/* Search, Department, Batch, and Sorting Filters */}
           <LeaderboardFilters
             branchOptions={branchOptions}
             yearOptions={yearOptions}
             selectedBranch={selectedBranch}
             selectedYear={selectedYear}
             searchQuery={searchQuery}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
             onBranchChange={setSelectedBranch}
             onYearChange={setSelectedYear}
             onSearchChange={setSearchQuery}
+            onSortByChange={setSortBy}
+            onToggleSortOrder={handleToggleSortOrder}
             onResetFilters={handleResetFilters}
             resultCount={processedStudents.length}
             totalCount={studentsList.length}
           />
 
+          {/* Dynamic Leaderboard Table with Pagination */}
           <LeaderboardTable
             students={processedStudents}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSortChange={handleSortChange}
             onResetFilters={handleResetFilters}
+            onNavigate={navigate}
           />
         </div>
       </main>
+
+      <ClosingCTA onNavigate={navigate} />
     </div>
   )
 }

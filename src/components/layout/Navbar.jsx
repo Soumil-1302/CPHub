@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import '../styles/navbar.css'
+import '../../styles/navbar.css'
 
 function Icon({ name, className = '' }) {
   const icons = {

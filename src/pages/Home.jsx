@@ -1,59 +1,34 @@
 import { useMemo } from 'react'
-import studentsData from '../data_students/students.json'
-import branchesData from '../data_students/branches.json'
-import FloatingNavbar from '../components/FloatingNavbar'
-import HeroSection from '../components/HeroSection'
-import CommunitySnapshot from '../components/CommunitySnapshot'
-import PlatformShowcase from '../components/PlatformShowcase'
-import LeaderboardPreview from '../components/LeaderboardPreview'
-import ContestsCommunity from '../components/ContestsCommunity'
-import ClosingCTA from '../components/ClosingCTA'
+import studentsData from '../data/students.json'
+import branchesData from '../data/branches.json'
+import FloatingNavbar from '../components/layout/FloatingNavbar'
+import HeroSection from '../components/home/HeroSection'
+import CommunitySnapshot from '../components/home/CommunitySnapshot'
+import PlatformShowcase from '../components/home/PlatformShowcase'
+import LeaderboardPreview from '../components/home/LeaderboardPreview'
+import ContestsCommunity from '../components/home/ContestsCommunity'
+import ClosingCTA from '../components/layout/ClosingCTA'
+import {
+  normalizeStudentsData,
+  getBranchList,
+  calculateCampusStats,
+} from '../utils/studentAnalytics'
 import '../styles/home.css'
 
 export default function Home({ navigate }) {
-  // Normalize students data whether array or object
+  // Normalize students data
   const studentsList = useMemo(() => {
-    if (!studentsData) return []
-    if (Array.isArray(studentsData)) return studentsData
-    if (typeof studentsData === 'object') {
-      return Object.entries(studentsData).map(([usn, data]) => ({
-        ...data,
-        usn,
-      }))
-    }
-    return []
+    return normalizeStudentsData(studentsData)
   }, [])
 
-  // Process branch list
+  // Process unique branch list
   const branchList = useMemo(() => {
-    if (!branchesData) return []
-    const map = branchesData.branch || branchesData
-    return Array.from(new Set(Object.values(map)))
+    return getBranchList(branchesData)
   }, [])
 
   // Compute campus metrics
   const campusStats = useMemo(() => {
-    let totalSolved = 0
-    let totalLc = 0
-    let totalCf = 0
-
-    for (const s of studentsList) {
-      const lc = Math.max(0, Number(s.leetcode) || 0)
-      const cf = Math.max(0, Number(s.codeforces) || 0)
-      const calculatedTotal = lc + cf
-      const sTotal = Number.isFinite(s.total) && s.total >= calculatedTotal ? s.total : calculatedTotal
-
-      totalLc += lc
-      totalCf += cf
-      totalSolved += sTotal
-    }
-
-    return {
-      totalStudents: studentsList.length,
-      totalSolved,
-      totalLc,
-      totalCf,
-    }
+    return calculateCampusStats(studentsList)
   }, [studentsList])
 
   return (
