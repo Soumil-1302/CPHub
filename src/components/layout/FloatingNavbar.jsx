@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useAuth } from '../../context/AuthContext'
 
 export default function FloatingNavbar({ onNavigate, currentPath = '/' }) {
+  const { user, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleLinkClick = (path) => {
@@ -14,6 +16,14 @@ export default function FloatingNavbar({ onNavigate, currentPath = '/' }) {
     }
     if (onNavigate) {
       onNavigate(path)
+    }
+  }
+
+  const handleSignOut = async () => {
+    setMobileMenuOpen(false)
+    await signOut()
+    if (onNavigate) {
+      onNavigate('/')
     }
   }
 
@@ -54,6 +64,12 @@ export default function FloatingNavbar({ onNavigate, currentPath = '/' }) {
             Contests
           </button>
           <button
+            className={`cphub-pill-link ${currentPath === '/resources' ? 'active' : ''}`}
+            onClick={() => handleLinkClick('/resources')}
+          >
+            Resources
+          </button>
+          <button
             className="cphub-pill-link"
             onClick={() => handleLinkClick('#community')}
           >
@@ -63,12 +79,29 @@ export default function FloatingNavbar({ onNavigate, currentPath = '/' }) {
 
         {/* Actions */}
         <div className="cphub-nav-actions">
-          <button
-            className="cphub-btn-pill-ghost"
-            onClick={() => handleLinkClick('/login')}
-          >
-            Sign In
-          </button>
+          {user ? (
+            <>
+              <button
+                className="cphub-btn-pill-ghost"
+                onClick={() => handleLinkClick('/my-profile')}
+              >
+                My Profile
+              </button>
+              <button
+                className="cphub-btn-pill-ghost"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <button
+              className="cphub-btn-pill-ghost"
+              onClick={() => handleLinkClick('/login')}
+            >
+              Sign In
+            </button>
+          )}
           <button
             className="cphub-btn-pill-primary"
             onClick={() => handleLinkClick('/leaderboard')}
@@ -121,17 +154,37 @@ export default function FloatingNavbar({ onNavigate, currentPath = '/' }) {
               Contests
             </button>
             <button
+              className={`cphub-pill-link ${currentPath === '/resources' ? 'active' : ''}`}
+              onClick={() => handleLinkClick('/resources')}
+            >
+              Resources
+            </button>
+            <button
               className="cphub-pill-link"
               onClick={() => handleLinkClick('#community')}
             >
               Community
             </button>
-            <button
-              className="cphub-pill-link"
-              onClick={() => handleLinkClick('/login')}
-            >
-              Sign In
-            </button>
+            {user ? (
+              <>
+                <button
+                  className={`cphub-pill-link ${currentPath === '/my-profile' ? 'active' : ''}`}
+                  onClick={() => handleLinkClick('/my-profile')}
+                >
+                  My Profile
+                </button>
+                <button className="cphub-pill-link" onClick={handleSignOut}>
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <button
+                className="cphub-pill-link"
+                onClick={() => handleLinkClick('/login')}
+              >
+                Sign In
+              </button>
+            )}
           </nav>
         )}
       </header>

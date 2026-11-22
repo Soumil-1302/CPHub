@@ -1,0 +1,160 @@
+/* ════════════════════════════════════════
+   CPHub — My Profile Page Styles
+   ════════════════════════════════════════ */
+
+/* Container — slightly wider than auth card */
+.myprofile-container {
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.myprofile-card {
+  padding: 40px;
+}
+
+/* Avatar circle */
+.myprofile-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #18181b 0%, #3f3f46 100%);
+  color: #fff;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* Email pill under the title */
+.myprofile-email-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 5px 12px;
+  background: var(--cphub-surface-subtle, #f5f3ee);
+  border: 1px solid var(--cphub-border-subtle, rgba(0, 0, 0, 0.05));
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--cphub-text-secondary, #4a4a4f);
+}
+
+/* Two-column row for branch + grad year */
+.myprofile-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Select dropdown styling */
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.form-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Hint below each field */
+.myprofile-field-hint {
+  font-size: 11.5px;
+  color: var(--cphub-text-muted, #71717a);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+/* Preview link (View on LeetCode ↗) */
+.myprofile-preview-link {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--cphub-accent, #d9383a);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.myprofile-preview-link:hover {
+  text-decoration: underline;
+}
+
+/* Metadata row (member since / last updated) */
+.myprofile-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--cphub-surface-subtle, #f5f3ee);
+  border: 1px solid var(--cphub-border-subtle, rgba(0, 0, 0, 0.05));
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cphub-text-muted, #71717a);
+}
+
+/* Loading dots animation */
+.myprofile-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.myprofile-loader-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cphub-accent, #d9383a);
+  animation: profilePulse 1.2s ease-in-out infinite;
+}
+
+.myprofile-loader-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.myprofile-loader-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes profilePulse {
+  0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 520px) {
+  .myprofile-container {
+    max-width: 100%;
+  }
+
+  .myprofile-card {
+    padding: 28px 20px;
+    border-radius: 18px;
+  }
+
+  .myprofile-row-2 {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .myprofile-meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

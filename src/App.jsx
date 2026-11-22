@@ -3,8 +3,11 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Leaderboard from './pages/Leaderboard'
 import Profile from './pages/Profile'
+import Resources from './pages/Resources'
+import MyProfile from './pages/MyProfile'
 import MagicCursor from './components/cursor/MagicCursor'
 import CursorController from './components/cursor/CursorController'
+import { AuthProvider } from './context/AuthContext'
 import { ROUTES } from './constants/routes'
 import './styles/global.css'
 import './styles/cursor.css'
@@ -34,7 +37,7 @@ function PagePlaceholder({ title, navigate }) {
   )
 }
 
-export default function App() {
+function AppRouter() {
   const [path, setPath] = useState(window.location.pathname || ROUTES.HOME)
   const [cursorActive, setCursorActive] = useState(true)
   const [cursorColor, setCursorColor] = useState('#10a09cff')
@@ -67,6 +70,10 @@ export default function App() {
       : ''
     const username = decodeURIComponent(rawUsername).replace(/^\/+|\/+$/g, '')
     content = <Profile username={username} navigate={navigate} />
+  } else if (path === ROUTES.RESOURCES) {
+    content = <Resources navigate={navigate} />
+  } else if (path === ROUTES.MY_PROFILE) {
+    content = <MyProfile navigate={navigate} />
   } else if (path === ROUTES.DASHBOARD) {
     content = <PagePlaceholder title="Dashboard" navigate={navigate} />
   } else if (path === ROUTES.CONTESTS) {
@@ -110,5 +117,13 @@ export default function App() {
 
       {content}
     </>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
   )
 }

@@ -12,11 +12,14 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   CONTESTS: '/contests',
   RANKINGS: '/rankings',
+  RESOURCES: '/resources',
+  MY_PROFILE: '/my-profile',
 }
 
 export const NAV_LINKS = [
   { label: 'Home', path: ROUTES.HOME },
   { label: 'Leaderboard', path: ROUTES.LEADERBOARD },
   { label: 'Contests', path: ROUTES.CONTESTS },
+  { label: 'Resources', path: ROUTES.RESOURCES },
   { label: 'Community', path: '#community' },
 ]
