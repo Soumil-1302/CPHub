@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -22,3 +23,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+=======
+.env.local
+>>>>>>> 3d3d96e (chore: add .env.local to gitignore and remove DS_Store)
