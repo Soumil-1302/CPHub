@@ -107,12 +107,12 @@ export default function ProfileHeader({ profileData, onNavigate }) {
         </div>
 
         <div className="quick-stat-box quick-stat-box-highlight">
-          <span className="stat-box-label">Total Problems Solved</span>
+          <span className="stat-box-label">LeetCode Problems Solved</span>
           <div className="stat-box-val-row">
             <span className="stat-box-val stat-val-accent">
               {(student.totalSolved || 0).toLocaleString()}
             </span>
-            <span className="stat-box-sub">Across All Platforms</span>
+            <span className="stat-box-sub">Campus Dataset</span>
           </div>
         </div>
       </div>

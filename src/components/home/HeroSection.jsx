@@ -71,19 +71,19 @@ export default function HeroSection({ onNavigate }) {
             <span className="float-card-sub">— Campus Dev Mindset</span>
           </div>
 
-          {/* Card 3: Mid-Left Codeforces Rating */}
+          {/* Card 3: Mid-Left Campus Milestone */}
           <div className="hero-float-card card-pos-mid-left">
             <div className="float-card-header">
               <img
-                src="/cf.jpeg"
+                src="/lc.jpeg"
                 alt=""
                 className="float-card-icon"
                 width="22"
                 height="22"
               />
-              <span className="float-card-tag">Codeforces</span>
+              <span className="float-card-tag">Campus Milestone</span>
             </div>
-            <p className="float-card-text">Specialist 1420 ▲ +86</p>
+            <p className="float-card-text">500+ Problems Solved 🎯</p>
             <span className="float-card-sub">@akhil_codes · Rank #1</span>
           </div>
 
@@ -112,15 +112,6 @@ export default function HeroSection({ onNavigate }) {
             </div>
             <p className="float-card-text">43,000+ Solved</p>
             <span className="float-card-sub">Across campus batches</span>
-          </div>
-
-          <div className="hero-float-card" style={{ display: 'block', minWidth: '220px' }}>
-            <div className="float-card-header">
-              <img src="/cf.jpeg" alt="" className="float-card-icon" width="20" height="20" />
-              <span className="float-card-tag">Codeforces</span>
-            </div>
-            <p className="float-card-text">38,600+ Questions</p>
-            <span className="float-card-sub">Rated contest debriefs</span>
           </div>
 
           <div className="hero-float-card" style={{ display: 'block', minWidth: '240px' }}>

@@ -5,8 +5,7 @@
         "year": "2025-2029",
         "branch": "CST",
         "leetcode": 542,
-        "codeforces": 381,
-        "total": 923
+        "total": 542
     },
     "eng24cs0061": {
         "name": "Ananya Rao",
@@ -14,8 +13,7 @@
         "year": "2024-2028",
         "branch": "CSE",
         "leetcode": 615,
-        "codeforces": 427,
-        "total": 1042
+        "total": 615
     },
     "eng23am0062": {
         "name": "Rohan Mehta",
@@ -23,8 +21,7 @@
         "year": "2023-2027",
         "branch": "AI&ML",
         "leetcode": 348,
-        "codeforces": 295,
-        "total": 643
+        "total": 348
     },
     "eng22cy0063": {
         "name": "Ishita Nair",
@@ -32,8 +29,7 @@
         "year": "2022-2026",
         "branch": "CYBER",
         "leetcode": 487,
-        "codeforces": 352,
-        "total": 839
+        "total": 487
     },
     "eng25ad0064": {
         "name": "Vihaan Kapoor",
@@ -41,8 +37,7 @@
         "year": "2025-2029",
         "branch": "AI&DS",
         "leetcode": 271,
-        "codeforces": 198,
-        "total": 469
+        "total": 271
     },
     "eng24ds0065": {
         "name": "Diya Menon",
@@ -50,8 +45,7 @@
         "year": "2024-2028",
         "branch": "DataSci",
         "leetcode": 589,
-        "codeforces": 416,
-        "total": 1005
+        "total": 589
     },
     "eng23ec0066": {
         "name": "Arjun Verma",
@@ -59,8 +53,7 @@
         "year": "2023-2027",
         "branch": "ECE",
         "leetcode": 183,
-        "codeforces": 241,
-        "total": 424
+        "total": 183
     },
     "eng22ra0067": {
         "name": "Meera Iyer",
@@ -68,8 +61,7 @@
         "year": "2022-2026",
         "branch": "ROBOTICS",
         "leetcode": 634,
-        "codeforces": 522,
-        "total": 1156
+        "total": 634
     },
     "eng25as0068": {
         "name": "Karan Singh",
@@ -77,8 +69,7 @@
         "year": "2025-2029",
         "branch": "AEROSPACE",
         "leetcode": 326,
-        "codeforces": 174,
-        "total": 500
+        "total": 326
     },
     "eng24me0069": {
         "name": "Sneha Joshi",
@@ -86,8 +77,7 @@
         "year": "2024-2028",
         "branch": "MECH",
         "leetcode": 412,
-        "codeforces": 287,
-        "total": 699
+        "total": 412
     },
     "eng23ct0070": {
         "name": "Aditya Kumar",
@@ -95,8 +85,7 @@
         "year": "2023-2027",
         "branch": "CST",
         "leetcode": 657,
-        "codeforces": 614,
-        "total": 1271
+        "total": 657
     },
     "eng22cs0071": {
         "name": "Nisha Patel",
@@ -104,8 +93,7 @@
         "year": "2022-2026",
         "branch": "CSE",
         "leetcode": 521,
-        "codeforces": 438,
-        "total": 959
+        "total": 521
     },
     "eng25am0072": {
         "name": "Kabir Shah",
@@ -113,8 +101,7 @@
         "year": "2025-2029",
         "branch": "AI&ML",
         "leetcode": 296,
-        "codeforces": 351,
-        "total": 647
+        "total": 296
     },
     "eng24cy0073": {
         "name": "Pooja Reddy",
@@ -122,8 +109,7 @@
         "year": "2024-2028",
         "branch": "CYBER",
         "leetcode": 447,
-        "codeforces": 209,
-        "total": 656
+        "total": 447
     },
     "eng23ad0074": {
         "name": "Rahul Das",
@@ -131,8 +117,7 @@
         "year": "2023-2027",
         "branch": "AI&DS",
         "leetcode": 378,
-        "codeforces": 462,
-        "total": 840
+        "total": 378
     },
     "eng22ds0075": {
         "name": "Aditi Malhotra",
@@ -140,8 +125,7 @@
         "year": "2022-2026",
         "branch": "DataSci",
         "leetcode": 689,
-        "codeforces": 574,
-        "total": 1263
+        "total": 689
     },
     "eng25ec0076": {
         "name": "Manav Gupta",
@@ -149,8 +133,7 @@
         "year": "2025-2029",
         "branch": "ECE",
         "leetcode": 218,
-        "codeforces": 163,
-        "total": 381
+        "total": 218
     },
     "eng24ra0077": {
         "name": "Tanya Sinha",
@@ -158,8 +141,7 @@
         "year": "2024-2028",
         "branch": "ROBOTICS",
         "leetcode": 536,
-        "codeforces": 448,
-        "total": 984
+        "total": 536
     },
     "eng23as0078": {
         "name": "Yash Agarwal",
@@ -167,8 +149,7 @@
         "year": "2023-2027",
         "branch": "AEROSPACE",
         "leetcode": 165,
-        "codeforces": 277,
-        "total": 442
+        "total": 165
     },
     "eng22me0079": {
         "name": "Kavya N",
@@ -176,8 +157,7 @@
         "year": "2022-2026",
         "branch": "MECH",
         "leetcode": 493,
-        "codeforces": 328,
-        "total": 821
+        "total": 493
     },
     "eng25ct0080": {
         "name": "Siddharth Jain",
@@ -185,8 +165,7 @@
         "year": "2025-2029",
         "branch": "CST",
         "leetcode": 602,
-        "codeforces": 671,
-        "total": 1273
+        "total": 602
     },
     "eng24cs0081": {
         "name": "Riya Kapoor",
@@ -194,8 +173,7 @@
         "year": "2024-2028",
         "branch": "CSE",
         "leetcode": 459,
-        "codeforces": 384,
-        "total": 843
+        "total": 459
     },
     "eng23am0082": {
         "name": "Aman Roy",
@@ -203,8 +181,7 @@
         "year": "2023-2027",
         "branch": "AI&ML",
         "leetcode": 314,
-        "codeforces": 226,
-        "total": 540
+        "total": 314
     },
     "eng22cy0083": {
         "name": "Shreya Bhat",
@@ -212,8 +189,7 @@
         "year": "2022-2026",
         "branch": "CYBER",
         "leetcode": 571,
-        "codeforces": 493,
-        "total": 1064
+        "total": 571
     },
     "eng25ad0084": {
         "name": "Harsh Vardhan",
@@ -221,8 +197,7 @@
         "year": "2025-2029",
         "branch": "AI&DS",
         "leetcode": 205,
-        "codeforces": 189,
-        "total": 394
+        "total": 205
     },
     "eng24ds0085": {
         "name": "Neha Sharma",
@@ -230,8 +205,7 @@
         "year": "2024-2028",
         "branch": "DataSci",
         "leetcode": 523,
-        "codeforces": 367,
-        "total": 890
+        "total": 523
     },
     "eng23ec0086": {
         "name": "Akash Yadav",
@@ -239,8 +213,7 @@
         "year": "2023-2027",
         "branch": "ECE",
         "leetcode": 187,
-        "codeforces": 302,
-        "total": 489
+        "total": 187
     },
     "eng22ra0087": {
         "name": "Lavanya Rao",
@@ -248,8 +221,7 @@
         "year": "2022-2026",
         "branch": "ROBOTICS",
         "leetcode": 641,
-        "codeforces": 583,
-        "total": 1224
+        "total": 641
     },
     "eng25as0088": {
         "name": "Nikhil R",
@@ -257,8 +229,7 @@
         "year": "2025-2029",
         "branch": "AEROSPACE",
         "leetcode": 278,
-        "codeforces": 315,
-        "total": 593
+        "total": 278
     },
     "eng24me0089": {
         "name": "Sanjana Iyer",
@@ -266,8 +237,7 @@
         "year": "2024-2028",
         "branch": "MECH",
         "leetcode": 396,
-        "codeforces": 247,
-        "total": 643
+        "total": 396
     },
     "eng23ct0090": {
         "name": "Dev Malhotra",
@@ -275,8 +245,7 @@
         "year": "2023-2027",
         "branch": "CST",
         "leetcode": 678,
-        "codeforces": 645,
-        "total": 1323
+        "total": 678
     },
     "eng22cs0091": {
         "name": "Maya Thomas",
@@ -284,8 +253,7 @@
         "year": "2022-2026",
         "branch": "CSE",
         "leetcode": 489,
-        "codeforces": 521,
-        "total": 1010
+        "total": 489
     },
     "eng25am0092": {
         "name": "Varun Shetty",
@@ -293,8 +261,7 @@
         "year": "2025-2029",
         "branch": "AI&ML",
         "leetcode": 346,
-        "codeforces": 278,
-        "total": 624
+        "total": 346
     },
     "eng24cy0093": {
         "name": "Keerthi Gowda",
@@ -302,8 +269,7 @@
         "year": "2024-2028",
         "branch": "CYBER",
         "leetcode": 418,
-        "codeforces": 361,
-        "total": 779
+        "total": 418
     },
     "eng23ad0094": {
         "name": "Ritesh Kumar",
@@ -311,8 +277,7 @@
         "year": "2023-2027",
         "branch": "AI&DS",
         "leetcode": 562,
-        "codeforces": 497,
-        "total": 1059
+        "total": 562
     },
     "eng22ds0095": {
         "name": "Sakshi Jain",
@@ -320,8 +285,7 @@
         "year": "2022-2026",
         "branch": "DataSci",
         "leetcode": 154,
-        "codeforces": 219,
-        "total": 373
+        "total": 154
     },
     "eng25ec0096": {
         "name": "Mohit S",
@@ -329,8 +293,7 @@
         "year": "2025-2029",
         "branch": "ECE",
         "leetcode": 373,
-        "codeforces": 286,
-        "total": 659
+        "total": 373
     },
     "eng24ra0097": {
         "name": "Anika Das",
@@ -338,8 +301,7 @@
         "year": "2024-2028",
         "branch": "ROBOTICS",
         "leetcode": 588,
-        "codeforces": 436,
-        "total": 1024
+        "total": 588
     },
     "eng23as0098": {
         "name": "Vivek Nair",
@@ -347,8 +309,7 @@
         "year": "2023-2027",
         "branch": "AEROSPACE",
         "leetcode": 241,
-        "codeforces": 193,
-        "total": 434
+        "total": 241
     },
     "eng22me0099": {
         "name": "Nandini Rao",
@@ -356,8 +317,7 @@
         "year": "2022-2026",
         "branch": "MECH",
         "leetcode": 427,
-        "codeforces": 339,
-        "total": 766
+        "total": 427
     },
     "eng25ct0100": {
         "name": "Karthik M",
@@ -365,8 +325,7 @@
         "year": "2025-2029",
         "branch": "CST",
         "leetcode": 647,
-        "codeforces": 612,
-        "total": 1259
+        "total": 647
     },
     "eng24cs0101": {
         "name": "Swati Kulkarni",
@@ -374,8 +333,7 @@
         "year": "2024-2028",
         "branch": "CSE",
         "leetcode": 382,
-        "codeforces": 449,
-        "total": 831
+        "total": 382
     },
     "eng23am0102": {
         "name": "Arnav Mehta",
@@ -383,8 +341,7 @@
         "year": "2023-2027",
         "branch": "AI&ML",
         "leetcode": 298,
-        "codeforces": 314,
-        "total": 612
+        "total": 298
     },
     "eng22cy0103": {
         "name": "Preeti Shah",
@@ -392,8 +349,7 @@
         "year": "2022-2026",
         "branch": "CYBER",
         "leetcode": 596,
-        "codeforces": 544,
-        "total": 1140
+        "total": 596
     },
     "eng25ad0104": {
         "name": "Abhinav Joshi",
@@ -401,8 +357,7 @@
         "year": "2025-2029",
         "branch": "AI&DS",
         "leetcode": 361,
-        "codeforces": 285,
-        "total": 646
+        "total": 361
     },
     "eng24ds0105": {
         "name": "Pallavi N",
@@ -410,8 +365,7 @@
         "year": "2024-2028",
         "branch": "DataSci",
         "leetcode": 504,
-        "codeforces": 398,
-        "total": 902
+        "total": 504
     },
     "eng23ec0106": {
         "name": "Raghav Singh",
@@ -419,8 +373,7 @@
         "year": "2023-2027",
         "branch": "ECE",
         "leetcode": 229,
-        "codeforces": 176,
-        "total": 405
+        "total": 229
     },
     "eng22ra0107": {
         "name": "Isha Kapoor",
@@ -428,8 +381,7 @@
         "year": "2022-2026",
         "branch": "ROBOTICS",
         "leetcode": 617,
-        "codeforces": 559,
-        "total": 1176
+        "total": 617
     },
     "eng25as0108": {
         "name": "Tarun Rao",
@@ -437,8 +389,7 @@
         "year": "2025-2029",
         "branch": "AEROSPACE",
         "leetcode": 287,
-        "codeforces": 342,
-        "total": 629
+        "total": 287
     },
     "eng24me0109": {
         "name": "Pavithra S",
@@ -446,8 +397,7 @@
         "year": "2024-2028",
         "branch": "MECH",
         "leetcode": 415,
-        "codeforces": 267,
-        "total": 682
+        "total": 415
     },
     "eng23ct0110": {
         "name": "Omkar Patil",
@@ -455,8 +405,7 @@
         "year": "2023-2027",
         "branch": "CST",
         "leetcode": 693,
-        "codeforces": 628,
-        "total": 1321
+        "total": 693
     },
     "eng22cs0111": {
         "name": "Shruti Reddy",
@@ -464,8 +413,7 @@
         "year": "2022-2026",
         "branch": "CSE",
         "leetcode": 534,
-        "codeforces": 487,
-        "total": 1021
+        "total": 534
     },
     "eng25am0112": {
         "name": "Dhruv Agarwal",
@@ -473,8 +421,7 @@
         "year": "2025-2029",
         "branch": "AI&ML",
         "leetcode": 319,
-        "codeforces": 251,
-        "total": 570
+        "total": 319
     },
     "eng24cy0113": {
         "name": "Ayesha Khan",
@@ -482,8 +429,7 @@
         "year": "2024-2028",
         "branch": "CYBER",
         "leetcode": 572,
-        "codeforces": 436,
-        "total": 1008
+        "total": 572
     },
     "eng23ad0114": {
         "name": "Suresh Kumar",
@@ -491,8 +437,7 @@
         "year": "2023-2027",
         "branch": "AI&DS",
         "leetcode": 198,
-        "codeforces": 225,
-        "total": 423
+        "total": 198
     },
     "eng22ds0115": {
         "name": "Harini V",
@@ -500,8 +445,7 @@
         "year": "2022-2026",
         "branch": "DataSci",
         "leetcode": 621,
-        "codeforces": 519,
-        "total": 1140
+        "total": 621
     },
     "eng25ec0116": {
         "name": "Sahil Verma",
@@ -509,8 +453,7 @@
         "year": "2025-2029",
         "branch": "ECE",
         "leetcode": 267,
-        "codeforces": 194,
-        "total": 461
+        "total": 267
     },
     "eng24ra0117": {
         "name": "Roshni Menon",
@@ -518,8 +461,7 @@
         "year": "2024-2028",
         "branch": "ROBOTICS",
         "leetcode": 548,
-        "codeforces": 603,
-        "total": 1151
+        "total": 548
     },
     "eng23as0118": {
         "name": "Naveen R",
@@ -527,8 +469,7 @@
         "year": "2023-2027",
         "branch": "AEROSPACE",
         "leetcode": 176,
-        "codeforces": 263,
-        "total": 439
+        "total": 176
     },
     "eng22me0119": {
         "name": "Deepika Rao",
@@ -536,8 +477,7 @@
         "year": "2022-2026",
         "branch": "MECH",
         "leetcode": 459,
-        "codeforces": 372,
-        "total": 831
+        "total": 459
     },
     "eng25ct0120": {
         "name": "Shreyas Gowda",
@@ -545,8 +485,7 @@
         "year": "2025-2029",
         "branch": "CST",
         "leetcode": 625,
-        "codeforces": 689,
-        "total": 1314
+        "total": 625
     },
     "eng24cs0121": {
         "name": "Madhuri S",
@@ -554,8 +493,7 @@
         "year": "2024-2028",
         "branch": "CSE",
         "leetcode": 441,
-        "codeforces": 382,
-        "total": 823
+        "total": 441
     },
     "eng23am0122": {
         "name": "Yuvraj Singh",
@@ -563,8 +501,7 @@
         "year": "2023-2027",
         "branch": "AI&ML",
         "leetcode": 357,
-        "codeforces": 298,
-        "total": 655
+        "total": 357
     },
     "eng22cy0123": {
         "name": "Rhea Mathew",
@@ -572,8 +509,7 @@
         "year": "2022-2026",
         "branch": "CYBER",
         "leetcode": 603,
-        "codeforces": 511,
-        "total": 1114
+        "total": 603
     },
     "eng25ad0124": {
         "name": "Ashwin Kumar",
@@ -581,8 +517,7 @@
         "year": "2025-2029",
         "branch": "AI&DS",
         "leetcode": 243,
-        "codeforces": 317,
-        "total": 560
+        "total": 243
     },
     "eng24ds0125": {
         "name": "Nitya Sharma",
@@ -590,8 +525,7 @@
         "year": "2024-2028",
         "branch": "DataSci",
         "leetcode": 568,
-        "codeforces": 427,
-        "total": 995
+        "total": 568
     },
     "eng23ec0126": {
         "name": "Rohit B",
@@ -599,8 +533,7 @@
         "year": "2023-2027",
         "branch": "ECE",
         "leetcode": 154,
-        "codeforces": 203,
-        "total": 357
+        "total": 154
     },
     "eng22ra0127": {
         "name": "Aishwarya N",
@@ -608,8 +541,7 @@
         "year": "2022-2026",
         "branch": "ROBOTICS",
         "leetcode": 579,
-        "codeforces": 617,
-        "total": 1196
+        "total": 579
     },
     "eng25as0128": {
         "name": "Chetan Shetty",
@@ -617,8 +549,7 @@
         "year": "2025-2029",
         "branch": "AEROSPACE",
         "leetcode": 302,
-        "codeforces": 271,
-        "total": 573
+        "total": 302
     },
     "eng24me0129": {
         "name": "Reshma K",
@@ -626,8 +557,7 @@
         "year": "2024-2028",
         "branch": "MECH",
         "leetcode": 391,
-        "codeforces": 318,
-        "total": 709
+        "total": 391
     },
     "eng23ct0130": {
         "name": "Vishal Jain",
@@ -635,8 +565,7 @@
         "year": "2023-2027",
         "branch": "CST",
         "leetcode": 664,
-        "codeforces": 601,
-        "total": 1265
+        "total": 664
     },
     "eng22cs0131": {
         "name": "Tanvi Rao",
@@ -644,8 +573,7 @@
         "year": "2022-2026",
         "branch": "CSE",
         "leetcode": 492,
-        "codeforces": 536,
-        "total": 1028
+        "total": 492
     },
     "eng25am0132": {
         "name": "Kunal Mehta",
@@ -653,8 +581,7 @@
         "year": "2025-2029",
         "branch": "AI&ML",
         "leetcode": 276,
-        "codeforces": 321,
-        "total": 597
+        "total": 276
     },
     "eng24cy0133": {
         "name": "Simran Kaur",
@@ -662,8 +589,7 @@
         "year": "2024-2028",
         "branch": "CYBER",
         "leetcode": 453,
-        "codeforces": 391,
-        "total": 844
+        "total": 453
     },
     "eng23ad0134": {
         "name": "Pranav Rao",
@@ -671,8 +597,7 @@
         "year": "2023-2027",
         "branch": "AI&DS",
         "leetcode": 337,
-        "codeforces": 276,
-        "total": 613
+        "total": 337
     },
     "eng22ds0135": {
         "name": "Bhavana S",
@@ -680,8 +605,7 @@
         "year": "2022-2026",
         "branch": "DataSci",
         "leetcode": 611,
-        "codeforces": 574,
-        "total": 1185
+        "total": 611
     },
     "eng25ec0136": {
         "name": "Nithin Kumar",
@@ -689,8 +613,7 @@
         "year": "2025-2029",
         "branch": "ECE",
         "leetcode": 184,
-        "codeforces": 229,
-        "total": 413
+        "total": 184
     },
     "eng24ra0137": {
         "name": "Sowmya R",
@@ -698,8 +621,7 @@
         "year": "2024-2028",
         "branch": "ROBOTICS",
         "leetcode": 507,
-        "codeforces": 468,
-        "total": 975
+        "total": 507
     },
     "eng23as0138": {
         "name": "Manish Verma",
@@ -707,8 +629,7 @@
         "year": "2023-2027",
         "branch": "AEROSPACE",
         "leetcode": 219,
-        "codeforces": 188,
-        "total": 407
+        "total": 219
     },
     "eng22me0139": {
         "name": "Pooja Nair",
@@ -716,8 +637,7 @@
         "year": "2022-2026",
         "branch": "MECH",
         "leetcode": 436,
-        "codeforces": 352,
-        "total": 788
+        "total": 436
     },
     "eng25ct0140": {
         "name": "Akhil Raj",
@@ -725,8 +645,7 @@
         "year": "2025-2029",
         "branch": "CST",
         "leetcode": 699,
-        "codeforces": 653,
-        "total": 1352
+        "total": 699
     },
     "eng24cs0141": {
         "name": "Sahana Rao",
@@ -734,8 +653,7 @@
         "year": "2024-2028",
         "branch": "CSE",
         "leetcode": 416,
-        "codeforces": 503,
-        "total": 919
+        "total": 416
     },
     "eng23am0142": {
         "name": "Tejas Patil",
@@ -743,8 +661,7 @@
         "year": "2023-2027",
         "branch": "AI&ML",
         "leetcode": 382,
-        "codeforces": 244,
-        "total": 626
+        "total": 382
     },
     "eng22cy0143": {
         "name": "Anushka Das",
@@ -752,8 +669,7 @@
         "year": "2022-2026",
         "branch": "CYBER",
         "leetcode": 577,
-        "codeforces": 641,
-        "total": 1218
+        "total": 577
     },
     "eng25ad0144": {
         "name": "Gaurav Singh",
@@ -761,8 +677,7 @@
         "year": "2025-2029",
         "branch": "AI&DS",
         "leetcode": 263,
-        "codeforces": 294,
-        "total": 557
+        "total": 263
     },
     "eng24ds0145": {
         "name": "Manya Kapoor",
@@ -770,8 +685,7 @@
         "year": "2024-2028",
         "branch": "DataSci",
         "leetcode": 546,
-        "codeforces": 389,
-        "total": 935
+        "total": 546
     },
     "eng23ec0146": {
         "name": "Sanjay Rao",
@@ -779,8 +693,7 @@
         "year": "2023-2027",
         "branch": "ECE",
         "leetcode": 207,
-        "codeforces": 154,
-        "total": 361
+        "total": 207
     },
     "eng22ra0147": {
         "name": "Navya Shetty",
@@ -788,8 +701,7 @@
         "year": "2022-2026",
         "branch": "ROBOTICS",
         "leetcode": 612,
-        "codeforces": 596,
-        "total": 1208
+        "total": 612
     },
     "eng25as0148": {
         "name": "Rakesh Kumar",
@@ -797,8 +709,7 @@
         "year": "2025-2029",
         "branch": "AEROSPACE",
         "leetcode": 294,
-        "codeforces": 226,
-        "total": 520
+        "total": 294
     },
     "eng24me0149": {
         "name": "Chandana R",
@@ -806,8 +717,7 @@
         "year": "2024-2028",
         "branch": "MECH",
         "leetcode": 367,
-        "codeforces": 311,
-        "total": 678
+        "total": 367
     },
     "eng23ct0150": {
         "name": "Adarsh Kumar",
@@ -815,8 +725,7 @@
         "year": "2023-2027",
         "branch": "CST",
         "leetcode": 638,
-        "codeforces": 677,
-        "total": 1315
+        "total": 638
     },
     "eng22cs0151": {
         "name": "Pooja Sharma",
@@ -824,8 +733,7 @@
         "year": "2022-2026",
         "branch": "CSE",
         "leetcode": 528,
-        "codeforces": 412,
-        "total": 940
+        "total": 528
     },
     "eng25am0152": {
         "name": "Naveen Shetty",
@@ -833,8 +741,7 @@
         "year": "2025-2029",
         "branch": "AI&ML",
         "leetcode": 341,
-        "codeforces": 289,
-        "total": 630
+        "total": 341
     },
     "eng24cy0153": {
         "name": "Ritika Jain",
@@ -842,8 +749,7 @@
         "year": "2024-2028",
         "branch": "CYBER",
         "leetcode": 463,
-        "codeforces": 518,
-        "total": 981
+        "total": 463
     },
     "eng23ad0154": {
         "name": "Abhishek R",
@@ -851,8 +757,7 @@
         "year": "2023-2027",
         "branch": "AI&DS",
         "leetcode": 226,
-        "codeforces": 183,
-        "total": 409
+        "total": 226
     },
     "eng22ds0155": {
         "name": "Shalini Menon",
@@ -860,8 +765,7 @@
         "year": "2022-2026",
         "branch": "DataSci",
         "leetcode": 594,
-        "codeforces": 621,
-        "total": 1215
+        "total": 594
     },
     "eng25ec0156": {
         "name": "Vikram Nair",
@@ -869,8 +773,7 @@
         "year": "2025-2029",
         "branch": "ECE",
         "leetcode": 173,
-        "codeforces": 218,
-        "total": 391
+        "total": 173
     },
     "eng24ra0157": {
         "name": "Nandita Rao",
@@ -878,8 +781,7 @@
         "year": "2024-2028",
         "branch": "ROBOTICS",
         "leetcode": 563,
-        "codeforces": 479,
-        "total": 1042
+        "total": 563
     },
     "eng23as0158": {
         "name": "Suraj Patil",
@@ -887,8 +789,7 @@
         "year": "2023-2027",
         "branch": "AEROSPACE",
         "leetcode": 305,
-        "codeforces": 271,
-        "total": 576
+        "total": 305
     },
     "eng22me0159": {
         "name": "Keerthana S",
@@ -896,7 +797,6 @@
         "year": "2022-2026",
         "branch": "MECH",
         "leetcode": 481,
-        "codeforces": 367,
-        "total": 848
+        "total": 481
     }
 }

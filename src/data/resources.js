@@ -151,18 +151,6 @@ export const RESOURCES = [
     dateAdded: '2026-10-25',
   },
   {
-    id: 'cf-problemsets',
-    title: 'Codeforces Problemsets',
-    description:
-      'Access thousands of curated competitive programming problems sorted by rating, tags, and contest origin on the world\'s largest CP platform.',
-    category: 'competitive-programming',
-    difficulty: 'intermediate',
-    url: 'https://codeforces.com/problemset',
-    platform: 'Codeforces',
-    featured: false,
-    dateAdded: '2026-10-14',
-  },
-  {
     id: 'usaco-guide',
     title: 'USACO Guide',
     description:
@@ -213,18 +201,6 @@ export const RESOURCES = [
     platform: 'LeetCode',
     featured: true,
     dateAdded: '2026-10-30',
-  },
-  {
-    id: 'platform-codeforces',
-    title: 'Codeforces',
-    description:
-      'The largest competitive programming platform with regular contests, a robust rating system, problem archive, and active community blogs.',
-    category: 'practice-platforms',
-    difficulty: 'intermediate',
-    url: 'https://codeforces.com/',
-    platform: 'Codeforces',
-    featured: true,
-    dateAdded: '2026-10-29',
   },
   {
     id: 'platform-atcoder',
@@ -289,18 +265,6 @@ export const RESOURCES = [
     platform: 'NeetCode',
     featured: false,
     dateAdded: '2026-10-16',
-  },
-  {
-    id: 'roadmap-advanced-cp',
-    title: 'Advanced Competitive Programming Roadmap',
-    description:
-      'Tackle advanced topics: segment trees, heavy-light decomposition, FFT, flows, advanced DP optimizations, and competitive math.',
-    category: 'learning-roadmaps',
-    difficulty: 'advanced',
-    url: 'https://codeforces.com/blog/entry/111099',
-    platform: 'Codeforces',
-    featured: false,
-    dateAdded: '2026-10-13',
   },
   {
     id: 'roadmap-interview-prep',
@@ -374,4 +338,3 @@ export const RESOURCES = [
     dateAdded: '2026-09-25',
   },
 ]
-

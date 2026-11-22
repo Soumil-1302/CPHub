@@ -58,15 +58,6 @@ export default function LeaderboardPodium({ topStudents = [], onNavigate }) {
                 <img src="/lc.jpeg" alt="LeetCode" width="16" height="16" />
                 <span>{(student.leetcode || 0).toLocaleString()}</span>
               </div>
-              <div className="podium-stat-pill">
-                <img src="/cf.jpeg" alt="Codeforces" width="16" height="16" />
-                <span>{(student.codeforces || 0).toLocaleString()}</span>
-              </div>
-            </div>
-
-            <div className="podium-total-box">
-              <span className="podium-total-label">Total Solved</span>
-              <span className="podium-total-value">{(student.total || 0).toLocaleString()}</span>
             </div>
 
             <button

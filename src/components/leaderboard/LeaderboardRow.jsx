@@ -1,7 +1,7 @@
 import { ROUTES } from '../../constants/routes'
 
-export default function LeaderboardRow({ student, maxTotal = 1200, onNavigate }) {
-  const { rank, username, name, usn, branchDisplay, leetcode, codeforces, total } = student
+export default function LeaderboardRow({ student, onNavigate }) {
+  const { rank, username, name, usn, branchDisplay, leetcode } = student
 
   const isTop1 = rank === 1
   const isTop2 = rank === 2
@@ -27,8 +27,6 @@ export default function LeaderboardRow({ student, maxTotal = 1200, onNavigate })
     e.stopPropagation()
     window.open(url, '_blank', 'noopener,noreferrer')
   }
-
-  const progressPercent = Math.min(100, Math.round(((total || 0) / (maxTotal || 1)) * 100))
 
   return (
     <tr
@@ -91,40 +89,6 @@ export default function LeaderboardRow({ student, maxTotal = 1200, onNavigate })
         </div>
       </td>
 
-      {/* 6. Codeforces */}
-      <td className="cell-platform">
-        <div
-          className="platform-cell-link"
-          title={`View @${username} on Codeforces`}
-          onClick={(e) => handleExternalClick(e, `https://codeforces.com/profile/${username}`)}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && handleExternalClick(e, `https://codeforces.com/profile/${username}`)}
-        >
-          <img
-            src="/cf.jpeg"
-            alt="Codeforces"
-            className="preview-platform-icon"
-            width="18"
-            height="18"
-          />
-          <span className="platform-count">{(codeforces || 0).toLocaleString()}</span>
-          <span className="external-hint" aria-hidden="true">↗</span>
-        </div>
-      </td>
-
-      {/* 7. Total Questions Solved */}
-      <td className="cell-total">
-        <div className="total-cell-wrap">
-          <span className="preview-total-badge">{(total || 0).toLocaleString()}</span>
-          <div className="total-progress-track" aria-hidden="true">
-            <div
-              className="total-progress-bar"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-        </div>
-      </td>
     </tr>
   )
 }

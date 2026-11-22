@@ -44,16 +44,13 @@ export default function Home({ navigate }) {
         <CommunitySnapshot
           totalStudents={campusStats.totalStudents}
           totalSolved={campusStats.totalSolved}
-          totalLc={campusStats.totalLc}
-          totalCf={campusStats.totalCf}
           branches={branchList}
         />
 
-        {/* Section D: LeetCode & Codeforces Platform Showcase */}
+        {/* Section D: LeetCode Platform Showcase */}
         <PlatformShowcase
           onNavigate={navigate}
-          totalLc={campusStats.totalLc}
-          totalCf={campusStats.totalCf}
+          totalLc={campusStats.totalSolved}
         />
 
         {/* Section E: Live Leaderboard Preview Table */}

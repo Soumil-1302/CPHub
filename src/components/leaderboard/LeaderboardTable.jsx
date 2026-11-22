@@ -3,7 +3,7 @@ import LeaderboardRow from './LeaderboardRow'
 
 export default function LeaderboardTable({
   students = [],
-  sortBy = 'total',
+  sortBy = 'leetcode',
   sortOrder = 'desc',
   onSortChange,
   onResetFilters,
@@ -20,11 +20,6 @@ export default function LeaderboardTable({
   }
 
   const pageSize = 20
-
-  const maxTotal = useMemo(() => {
-    if (students.length === 0) return 1200
-    return Math.max(...students.map((s) => s.total || 0), 100)
-  }, [students])
 
   const totalPages = Math.ceil(students.length / pageSize) || 1
   const paginatedStudents = useMemo(() => {
@@ -82,7 +77,7 @@ export default function LeaderboardTable({
   return (
     <div className="leaderboard-table-card">
       <div className="leaderboard-table-wrapper">
-        <table className="leaderboard-table" aria-label="University Competitive Programming Leaderboard">
+        <table className="leaderboard-table" aria-label="University LeetCode Leaderboard">
           <thead>
             <tr>
               <th
@@ -118,24 +113,6 @@ export default function LeaderboardTable({
                 <span>LeetCode</span>
                 {renderSortIndicator('leetcode')}
               </th>
-              <th
-                scope="col"
-                className="th-platform sortable"
-                onClick={() => handleHeaderClick('codeforces')}
-                title="Sort by Codeforces Solves"
-              >
-                <span>Codeforces</span>
-                {renderSortIndicator('codeforces')}
-              </th>
-              <th
-                scope="col"
-                className="th-total sortable"
-                onClick={() => handleHeaderClick('total')}
-                title="Sort by Total Solved"
-              >
-                <span>Total Solved</span>
-                {renderSortIndicator('total')}
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -143,7 +120,6 @@ export default function LeaderboardTable({
               <LeaderboardRow
                 key={student.username || student.rank || student.usn}
                 student={student}
-                maxTotal={maxTotal}
                 onNavigate={onNavigate}
               />
             ))}

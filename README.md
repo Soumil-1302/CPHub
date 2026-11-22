@@ -1,6 +1,6 @@
 # CPHub Frontend
 
-**CPHub** is the competitive programming community platform for Dayananda Sagar University (DSU). It aggregates, analyzes, and ranks student problem-solving velocity across LeetCode and Codeforces, providing real-time leaderboards, batch breakdowns, and campus milestone highlights.
+**CPHub** is the problem-solving community platform for Dayananda Sagar University (DSU). It ranks students by LeetCode problems solved and provides campus leaderboards, batch breakdowns, and profile milestones.
 
 ---
 
@@ -26,7 +26,6 @@ Frontend/
 ├── PROJECT_STRUCTURE.md         # In-depth architectural documentation
 │
 ├── public/                      # Static publicly served assets (favicons, logos)
-│   ├── cf.jpeg                  # Codeforces logo
 │   ├── lc.jpeg                  # LeetCode logo
 │   ├── favicon2.png             # App favicon
 │   └── icons.svg                # Shared SVG icons
@@ -40,13 +39,13 @@ Frontend/
     │
     ├── data/                    # Static datasets and mappings
     │   ├── branches.json        # University department code-to-name mapping
-    │   └── students.json        # Normalized student contest data
+    │   └── students.json        # Student identity, university, and LeetCode data
     │
     ├── services/                # API communication and external integrations
     │   └── authService.js       # University email magic-link auth service
     │
     ├── utils/                   # Pure business logic and analytics helpers
-    │   ├── studentAnalytics.js  # Data parsing, ranking algorithms, campus stats
+    │   ├── studentAnalytics.js  # LeetCode-only ranking and campus statistics
     │   └── studentAnalytics.test.js # Unit test suite for analytics functions
     │
     ├── components/              # Modular UI components
@@ -150,7 +149,8 @@ npm run preview
 
 ## 🏛 Key Architectural Decisions
 
-1. **Separation of Concerns:** Component files only handle presentation and local user events. Business logic (data normalization, branch resolution, ranking tie-breakers, campus summary math) is isolated in pure, testable functions in `src/utils/studentAnalytics.js`.
-2. **Domain-Grouped Components:** Reusable components are organized by functional domain (`layout/`, `home/`, `leaderboard/`, `cursor/`, `common/`) rather than an unstructured flat folder.
-3. **Dead Code Elimination:** Outdated boilerplate and orphan mock components (`Hero.jsx`, `Stats.jsx`, `Button.jsx`, `hero.css`, `stats.css`, `button.css`, `react.svg`) have been pruned to reduce bundle size and developer cognitive load.
-4. **Resilient Data Layer:** `normalizeStudentsData` transparently handles both JSON arrays and object maps keyed by student USN, avoiding runtime type errors when backend data formats vary.
+1. **LeetCode-only statistics:** Campus totals, leaderboard ranks, and profile solve counts are calculated from each student's LeetCode solve count. Student identity and university information remain independent of those statistics.
+2. **Separation of Concerns:** Component files only handle presentation and local user events. Business logic (data normalization, branch resolution, ranking tie-breakers, campus summary math) is isolated in pure, testable functions in `src/utils/studentAnalytics.js`.
+3. **Domain-Grouped Components:** Reusable components are organized by functional domain (`layout/`, `home/`, `leaderboard/`, `cursor/`, `common/`) rather than an unstructured flat folder.
+4. **Dead Code Elimination:** Outdated boilerplate and orphan mock components (`Hero.jsx`, `Stats.jsx`, `Button.jsx`, `hero.css`, `stats.css`, `button.css`, `react.svg`) have been pruned to reduce bundle size and developer cognitive load.
+5. **Resilient Data Layer:** `normalizeStudentsData` transparently handles both JSON arrays and object maps keyed by student USN, avoiding runtime type errors when backend data formats vary.

@@ -33,10 +33,10 @@ Centralized, zero-dependency business logic functions:
 - **`resolveBranchName(branchVal, branchMap)`**: Maps department codes (`ct`, `cs`, `am`, etc.) to official branch names (`CST`, `CSE`, `AI&ML`, etc.).
 - **`getBranchList(branchesData)`**: Extracts the unique set of active university engineering departments.
 - **`getYearOptions(studentsList)`**: Determines distinct student graduation cohorts, sorted descending.
-- **`calculateCampusStats(studentsList, branchMap)`**: Computes aggregated campus statistics (total students, total solved, platform breakdown, active department counts).
-- **`processLeaderboardStudents(studentsList, filters, branchMap)`**: Executes multi-criteria filtering (department, batch year, search query), safe calculation of solve counts, tie-breaking sorting (Total $\rightarrow$ LeetCode $\rightarrow$ Codeforces $\rightarrow$ Name), and dynamic 1-based rank assignment.
+- **`calculateCampusStats(studentsList, branchMap)`**: Computes aggregated campus statistics (student count, LeetCode solves, active department count).
+- **`processLeaderboardStudents(studentsList, filters, branchMap)`**: Executes multi-criteria filtering (department, batch year, search query), ranks by LeetCode solves with a name tie-breaker, and assigns dynamic 1-based ranks.
 - **`getStudentByIdentifier(studentsList, identifier)`**: Resolves a student by username or USN case-insensitively.
-- **`computeStudentProfileData(student, studentsList, branchMap)`**: Computes overall campus rank, department rank, cohort/batch rank, LeetCode difficulty breakdown (Easy, Medium, Hard), Codeforces title tier & rating estimate, solving ratios, and earned campus honor badges.
+- **`computeStudentProfileData(student, studentsList, branchMap)`**: Computes overall campus rank, department rank, cohort/batch rank, LeetCode difficulty breakdown (Easy, Medium, Hard), and earned campus honor badges.
 
 ### 2.2 Navigation & Routing Architecture (`src/constants/routes.js`)
 
@@ -70,18 +70,17 @@ Dynamic route patterns in `App.jsx` parse direct URLs such as `/profile/:usernam
    - Simulated LDAP verification notice with instant action buttons.
 
 2. **Leaderboard (`/leaderboard` via `src/pages/Leaderboard.jsx` & `src/styles/leaderboard.css`)**:
-   - Header with active students count, total solved, LeetCode / Codeforces sums, and active departments.
+   - Header with active student count, LeetCode solve count, and active departments.
    - Top 3 podium showcase cards (🥇 1st Place, 🥈 2nd Place, 🥉 3rd Place) with direct profile links.
    - Filter bar with search by coder handle, student name, or USN; department dropdown; graduation batch dropdown; metric sort selection; sort order toggle; and reset button.
-   - Responsive table displaying Rank, Username, Student Name & USN, Department, LeetCode solves with logo, Codeforces solves with logo, Total Solved with progress bar, and row-click navigation to profile.
+   - Responsive table displaying Rank, Username, Student Name & USN, Department, and LeetCode solves with profile navigation.
    - Efficient client pagination (20 per page) with page number controls.
 
 3. **Individual User Profile (`/profile/:username` via `src/pages/Profile.jsx` & `src/styles/profile.css`)**:
    - Header with back-to-leaderboard button, initials avatar, official campus rank badge, student name, `@username`, USN, Dayananda Sagar University affiliation, department, and batch tags.
-   - Quick stats grid: Overall campus rank, Department rank, Cohort batch rank, Total Solved across platforms.
-   - Dedicated LeetCode card: verified solve count, stacked difficulty bar, Easy/Medium/Hard counts, and external link.
-   - Dedicated Codeforces card: verified solve count, rating status, title category badge (Specialist, Expert, Pupil), and external link.
-   - Benchmark card: Platform solving balance (LeetCode % vs Codeforces %), top percentile badge, and earned campus milestone badges.
+   - Quick stats grid: Overall campus rank, Department rank, Cohort batch rank, and LeetCode solves.
+   - Dedicated LeetCode card: recorded solve count, stacked difficulty bar, Easy/Medium/Hard counts, and external link.
+   - Benchmark card: LeetCode campus percentile and earned campus milestone badges.
    - Graceful 404 / Missing student state with suggestions for top campus leaders.
 
 ---

@@ -7,25 +7,22 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
   // Top branch options for quick preview tabs
   const filterTabs = ['ALL', 'CST', 'CSE', 'AI&ML', 'CYBER', 'AI&DS']
 
-  // Filter and sort students descending by total
+  // Filter and sort students descending by LeetCode solve count
   const filteredPreview = useMemo(() => {
     let list = students
     if (selectedBranch !== 'ALL') {
       list = list.filter((s) => (s.branch || '').toUpperCase() === selectedBranch)
     }
 
-    // Sort descending by total
+    // Sort descending by LeetCode solve count
     const sorted = [...list].sort((a, b) => {
-      const aTotal = Number.isFinite(a.total) ? a.total : (Number(a.leetcode) || 0) + (Number(a.codeforces) || 0)
-      const bTotal = Number.isFinite(b.total) ? b.total : (Number(b.leetcode) || 0) + (Number(b.codeforces) || 0)
-      return bTotal - aTotal
+      return (Number(b.leetcode) || 0) - (Number(a.leetcode) || 0)
     })
 
     // Take top 6 for the preview
     return sorted.slice(0, 6).map((student, idx) => ({
       ...student,
       rank: idx + 1,
-      totalSolved: Number.isFinite(student.total) ? student.total : (Number(student.leetcode) || 0) + (Number(student.codeforces) || 0),
     }))
   }, [students, selectedBranch])
 
@@ -41,7 +38,7 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
             The University <span className="italic-serif">CP Standings.</span>
           </h2>
           <p className="section-desc-editorial" style={{ margin: '0 auto' }}>
-            Live preview of top problem solvers across campus. Ranked by verified total solves across LeetCode and Codeforces.
+            Preview of campus students ranked by LeetCode problems solved.
           </p>
         </div>
 
@@ -77,9 +74,7 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
                   <th scope="col" style={{ minWidth: '150px' }}>Username</th>
                   <th scope="col" style={{ minWidth: '170px' }}>Name</th>
                   <th scope="col" style={{ width: '110px', textAlign: 'center' }}>Branch</th>
-                  <th scope="col" style={{ width: '130px' }}>LeetCode</th>
-                  <th scope="col" style={{ width: '130px' }}>Codeforces</th>
-                  <th scope="col" style={{ width: '120px', textAlign: 'right' }}>Total Solved</th>
+                  <th scope="col" style={{ width: '130px' }}>LeetCode Solved</th>
                 </tr>
               </thead>
               <tbody>
@@ -126,23 +121,6 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
                         <span>{(student.leetcode || 0).toLocaleString()}</span>
                       </div>
                     </td>
-                    <td>
-                      <div className="preview-stat-cell">
-                        <img
-                          src="/cf.jpeg"
-                          alt="Codeforces"
-                          className="preview-platform-icon"
-                          width="18"
-                          height="18"
-                        />
-                        <span>{(student.codeforces || 0).toLocaleString()}</span>
-                      </div>
-                    </td>
-                    <td style={{ textAlign: 'right' }}>
-                      <span className="preview-total-badge">
-                        {student.totalSolved.toLocaleString()}
-                      </span>
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -152,7 +130,7 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
           {/* Table Footer with Full View CTA */}
           <div className="preview-footer">
             <span className="preview-footer-note">
-              Rankings recalculate instantly on new problem solves and verified contest ratings. Click any student to view their detailed profile.
+              Rankings are based on LeetCode solve counts. Click any student to view their profile.
             </span>
             <button
               className="btn-preview-cta"

@@ -1,5 +1,5 @@
 export default function ProfileComparison({ profileData }) {
-  const { student, campusRank, totalStudents, campusPercentile, lcPercent, cfPercent, badges } =
+  const { student, campusRank, totalStudents, campusPercentile, badges } =
     profileData
 
   return (
@@ -7,49 +7,15 @@ export default function ProfileComparison({ profileData }) {
       <div className="comparison-card">
         <div className="comparison-header">
           <div>
-            <h2 className="comparison-title">Campus Benchmark &amp; Platform Distribution</h2>
+            <h2 className="comparison-title">Campus LeetCode Benchmark</h2>
             <p className="comparison-desc">
-              How {student.name}&apos;s algorithmic velocity compares to the {totalStudents} active competitive programmers at DSU.
+              How {student.name}&apos;s LeetCode solve count compares with {totalStudents} students in the campus dataset.
             </p>
           </div>
 
           <div className="percentile-badge">
             <span className="percentile-num">Top {campusPercentile}%</span>
             <span className="percentile-label">Campus Standing</span>
-          </div>
-        </div>
-
-        {/* Platform Share Split */}
-        <div className="distribution-block">
-          <div className="distribution-header">
-            <span className="dist-label">Solving Balance: LeetCode vs Codeforces</span>
-            <span className="dist-values">
-              <strong>{lcPercent}%</strong> LC • <strong>{cfPercent}%</strong> CF
-            </span>
-          </div>
-
-          <div className="distribution-bar-track" aria-label="LeetCode vs Codeforces Distribution">
-            <div
-              className="dist-bar-lc"
-              style={{ width: `${lcPercent}%` }}
-              title={`LeetCode: ${lcPercent}%`}
-            />
-            <div
-              className="dist-bar-cf"
-              style={{ width: `${cfPercent}%` }}
-              title={`Codeforces: ${cfPercent}%`}
-            />
-          </div>
-
-          <div className="distribution-legend">
-            <span className="legend-item">
-              <span className="legend-dot dot-lc" aria-hidden="true" />
-              <span>LeetCode ({student.leetcode || 0} solves)</span>
-            </span>
-            <span className="legend-item">
-              <span className="legend-dot dot-cf" aria-hidden="true" />
-              <span>Codeforces ({student.codeforces || 0} solves)</span>
-            </span>
           </div>
         </div>
 
@@ -87,7 +53,7 @@ export default function ProfileComparison({ profileData }) {
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
           <span>
-            Campus metrics are indexed directly from verified university records. Rank #{campusRank} calculated using total solved problems with standard tie-break criteria.
+            Campus rank #{campusRank} is calculated from LeetCode solve counts in the student dataset.
           </span>
         </div>
       </div>

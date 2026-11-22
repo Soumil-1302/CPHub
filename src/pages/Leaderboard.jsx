@@ -21,7 +21,7 @@ export default function Leaderboard({ navigate }) {
   const [selectedBranch, setSelectedBranch] = useState('ALL')
   const [selectedYear, setSelectedYear] = useState('ALL')
   const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState('total')
+  const [sortBy, setSortBy] = useState('leetcode')
   const [sortOrder, setSortOrder] = useState('desc')
 
   // 1. Process branches map from branches.json
@@ -84,7 +84,7 @@ export default function Leaderboard({ navigate }) {
     setSelectedBranch('ALL')
     setSelectedYear('ALL')
     setSearchQuery('')
-    setSortBy('total')
+    setSortBy('leetcode')
     setSortOrder('desc')
   }
 
@@ -97,8 +97,6 @@ export default function Leaderboard({ navigate }) {
           <LeaderboardHeader
             totalStudents={overallMetrics.totalStudents}
             totalSolved={overallMetrics.totalSolved}
-            totalLc={overallMetrics.totalLc}
-            totalCf={overallMetrics.totalCf}
             activeBranchCount={overallMetrics.activeBranchCount}
           />
 

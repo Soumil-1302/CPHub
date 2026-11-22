@@ -1,14 +1,12 @@
 export default function LeaderboardHeader({
   totalStudents = 0,
   totalSolved = 0,
-  totalLc = 0,
-  totalCf = 0,
   activeBranchCount = 0,
 }) {
   return (
     <header className="leaderboard-header">
       <div className="section-eyebrow">
-        <span>Verified Campus Standings</span>
+        <span>Campus LeetCode Standings</span>
       </div>
 
       <h1 className="section-heading-editorial">
@@ -16,8 +14,7 @@ export default function LeaderboardHeader({
       </h1>
 
       <p className="section-desc-editorial" style={{ margin: '0 auto 36px auto' }}>
-        Track real-time algorithmic solving velocity across LeetCode &amp; Codeforces.
-        Compare performance with peers across engineering cohorts and celebrate campus milestones.
+        Compare LeetCode solve totals with peers across engineering cohorts and celebrate campus milestones.
       </p>
 
       {/* Summary Metrics Bar */}
@@ -29,17 +26,7 @@ export default function LeaderboardHeader({
         <div className="metric-box-divider" aria-hidden="true" />
         <div className="metric-box">
           <span className="metric-box__num">{totalSolved.toLocaleString()}</span>
-          <span className="metric-box__label">Total Problems Solved</span>
-        </div>
-        <div className="metric-box-divider" aria-hidden="true" />
-        <div className="metric-box">
-          <span className="metric-box__num">{totalLc.toLocaleString()}</span>
-          <span className="metric-box__label">LeetCode Solves</span>
-        </div>
-        <div className="metric-box-divider" aria-hidden="true" />
-        <div className="metric-box">
-          <span className="metric-box__num">{totalCf.toLocaleString()}</span>
-          <span className="metric-box__label">Codeforces Solves</span>
+          <span className="metric-box__label">LeetCode Problems Solved</span>
         </div>
         <div className="metric-box-divider" aria-hidden="true" />
         <div className="metric-box">

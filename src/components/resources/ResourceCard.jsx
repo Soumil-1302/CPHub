@@ -23,7 +23,6 @@ const PLATFORM_ICONS = {
   GeeksforGeeks: '📗',
   CSES: '📘',
   'CP Algorithms': '📙',
-  Codeforces: '⚡',
   USACO: '🐄',
   AtCoder: '🏯',
   LeetCode: '💡',
@@ -114,4 +113,3 @@ export default function ResourceCard({ resource, style }) {
     </article>
   )
 }
-

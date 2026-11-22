@@ -48,7 +48,7 @@ export default function ClosingCTA({ onNavigate }) {
               </div>
               <p className="footer-brand-desc">
                 The competitive programming network for Dayananda Sagar University.
-                Empowering students to build problem-solving velocity across LeetCode &amp; Codeforces.
+                Helping students track LeetCode practice and build problem-solving skills.
               </p>
             </div>
 
@@ -67,7 +67,6 @@ export default function ClosingCTA({ onNavigate }) {
                 <h4 className="footer-col-title">Platforms</h4>
                 <div className="footer-col-links">
                   <button className="footer-link" onClick={() => onNavigate && onNavigate('/leaderboard')}>LeetCode Rankings</button>
-                  <button className="footer-link" onClick={() => onNavigate && onNavigate('/leaderboard')}>Codeforces Standings</button>
                   <button className="footer-link" onClick={() => onNavigate && onNavigate('/rankings')}>Batch Analytics</button>
                 </div>
               </div>

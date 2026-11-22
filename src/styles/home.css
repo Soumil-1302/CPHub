@@ -888,51 +888,7 @@
   color: var(--cphub-text-main);
 }
 
-/* Codeforces Tier & Stat Box */
-.cf-performance-box {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: var(--cphub-radius-md);
-  padding: 20px;
-  margin-bottom: 28px;
-}
-
-.cf-performance-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.cf-top-handle-pill {
-  background: #e0f2fe;
-  color: #0369a1;
-  font-family: ui-monospace, monospace;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 6px;
-}
-
-.cf-ranks-pills {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.cf-tier-chip {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.cf-tier-dot {
+.difficulty-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;

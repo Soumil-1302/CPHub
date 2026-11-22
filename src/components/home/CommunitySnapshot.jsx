@@ -1,12 +1,8 @@
 export default function CommunitySnapshot({
   totalStudents = 100,
-  totalSolved = 81747,
-  totalLc = 43099,
-  totalCf = 38648,
+  totalSolved = 43099,
   branches = ['CST', 'CSE', 'AI&ML', 'CYBER', 'AI&DS', 'DataSci', 'ECE', 'ROBOTICS', 'AEROSPACE', 'MECH'],
 }) {
-  const lcPercent = Math.round((totalLc / (totalLc + totalCf)) * 100) || 53
-  const cfPercent = 100 - lcPercent
 
   return (
     <section id="snapshot" className="cphub-snapshot-section" aria-label="Community Snapshot">
@@ -29,41 +25,15 @@ export default function CommunitySnapshot({
           <div className="snapshot-card snapshot-card-featured">
             <div>
               <div className="snapshot-header-row">
-                <span className="snapshot-label">Campus Submissions</span>
-                <span className="snapshot-badge">Verified Data</span>
+                <span className="snapshot-label">LeetCode Problems Solved</span>
+                <span className="snapshot-badge">Campus Dataset</span>
               </div>
               <div className="snapshot-stat-number snapshot-stat-number-lg">
                 {totalSolved.toLocaleString()}
               </div>
               <p className="snapshot-desc">
-                Total competitive-programming problems solved and validated across university batches.
+                LeetCode problems recorded across university batches.
               </p>
-            </div>
-
-            <div className="snapshot-progress-wrap">
-              <div className="snapshot-progress-bar" role="progressbar" aria-valuenow={totalSolved} aria-label="LeetCode vs Codeforces breakdown">
-                <div
-                  className="snapshot-progress-fill-lc"
-                  style={{ width: `${lcPercent}%` }}
-                  title={`LeetCode: ${totalLc.toLocaleString()} (${lcPercent}%)`}
-                />
-                <div
-                  className="snapshot-progress-fill-cf"
-                  style={{ width: `${cfPercent}%` }}
-                  title={`Codeforces: ${totalCf.toLocaleString()} (${cfPercent}%)`}
-                />
-              </div>
-
-              <div className="snapshot-progress-legend">
-                <div className="legend-item">
-                  <span className="legend-dot" style={{ background: '#f59e0b' }} />
-                  <span>LeetCode: <strong>{totalLc.toLocaleString()}</strong> ({lcPercent}%)</span>
-                </div>
-                <div className="legend-item">
-                  <span className="legend-dot" style={{ background: '#3b82f6' }} />
-                  <span>Codeforces: <strong>{totalCf.toLocaleString()}</strong> ({cfPercent}%)</span>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -76,7 +46,7 @@ export default function CommunitySnapshot({
               </div>
               <div className="snapshot-stat-number">{totalStudents}</div>
               <p className="snapshot-desc">
-                University students actively competing, practicing daily algorithms, and climbing rankings.
+                University students practicing algorithms and climbing the campus LeetCode rankings.
               </p>
             </div>
             <div style={{ fontSize: '13px', color: 'var(--cphub-text-muted)' }}>

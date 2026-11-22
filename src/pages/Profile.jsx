@@ -53,7 +53,7 @@ export default function Profile({ username, navigate }) {
                 onNavigate={navigate}
               />
 
-              {/* LeetCode & Codeforces deep dive cards */}
+              {/* LeetCode statistics */}
               <PlatformBreakdown
                 profileData={profileData}
               />
