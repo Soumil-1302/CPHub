@@ -30,6 +30,11 @@ Frontend/
 │   ├── favicon2.png             # App favicon
 │   └── icons.svg                # Shared SVG icons
 │
+├── supabase/                    # Database migration and Edge Function
+│   ├── config.toml              # Function JWT verification settings
+│   ├── migrations/              # Database migrations
+│   └── functions/               # Server-side LeetCode stats provider
+│
 └── src/
     ├── main.jsx                 # Application bootstrapping & root render
     ├── App.jsx                  # Root router, global providers, and state
@@ -41,8 +46,10 @@ Frontend/
     │   ├── branches.json        # University department code-to-name mapping
     │   └── students.json        # Student identity, university, and LeetCode data
     │
-    ├── services/                # API communication and external integrations
-    │   └── authService.js       # University email magic-link auth service
+    ├── services/                # Supabase auth, database, and function calls
+    │   ├── authService.js       # University email OTP auth service
+    │   ├── databaseService.js   # Profile, stats, and Edge Function access
+    │   └── supabaseClient.js    # Browser Supabase client
     │
     ├── utils/                   # Pure business logic and analytics helpers
     │   ├── studentAnalytics.js  # LeetCode-only ranking and campus statistics
@@ -144,6 +151,68 @@ Preview the production build locally:
 ```bash
 npm run preview
 ```
+
+## LeetCode Statistics Provider
+
+LeetCode statistics are requested only by the authenticated
+`supabase/functions/leetcode-refresh` Edge Function. The browser asks the
+function to refresh the signed-in user's saved LeetCode username; it does not
+contact LeetCode or send LeetCode credentials. The provider adapter is isolated
+in `supabase/functions/_shared/leetcodeProvider.js` so the upstream integration
+can be replaced independently.
+
+The adapter uses LeetCode's public-profile GraphQL response under the project's
+authorization to use that endpoint. This GraphQL interface is undocumented and
+may change; do not enable or use it without appropriate authorization. The
+function validates the matched username, total and difficulty counts, and
+calendar before storing anything. A 6-hour cache, a database-backed 5-minute
+per-username request interval, a short provider timeout, and response-size
+limits reduce upstream load. Failed attempts update private fetch state and do
+not replace the last successful stats.
+
+### Deploying
+
+From `Frontend/`, link the Supabase CLI to the intended project and apply the
+pending database migrations (including `002_leetcode_provider.sql`):
+
+```bash
+supabase login
+supabase link --project-ref <your-project-ref>
+supabase db push
+supabase functions deploy leetcode-refresh
+```
+
+The function requires the standard server-side Supabase environment values
+(`SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`). Supabase
+provides these to Edge Functions. Never put the service-role key in a `VITE_*`
+variable, source code, or the browser bundle. JWT verification is enabled in
+`supabase/config.toml`.
+
+### Invoking
+
+After deployment, sign in, save a LeetCode username in **My Profile**, and use
+**Refresh LeetCode Stats**. The frontend calls `supabase.functions.invoke()`
+with an empty JSON object; the function obtains the username from the
+authenticated user's CPHub profile.
+
+For a manual authenticated request, POST `{}` to
+`https://<project-ref>.supabase.co/functions/v1/leetcode-refresh` with the
+Supabase publishable key and the user's current Supabase access token:
+
+```bash
+curl -X POST "https://<project-ref>.supabase.co/functions/v1/leetcode-refresh" \
+  -H "apikey: <supabase-publishable-key>" \
+  -H "Authorization: Bearer <user-access-token>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+The Supabase token is for CPHub authentication only and is never sent to
+LeetCode. Successful responses include normalized stats; failures include an
+error code and preserve any previously saved successful stats.
+
+The function is not deployed by this repository change. Provider validation
+tests run with `npm test`.
 
 ---
 

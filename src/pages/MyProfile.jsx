@@ -2,7 +2,12 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import FloatingNavbar from '../components/layout/FloatingNavbar'
 import ClosingCTA from '../components/layout/ClosingCTA'
 import { useAuth } from '../context/AuthContext'
-import { getMyProfile, updateMyProfile } from '../services/databaseService'
+import {
+  getLeetcodeStats,
+  getMyProfile,
+  refreshMyLeetcodeStats,
+  updateMyProfile,
+} from '../services/databaseService'
 import { ROUTES } from '../constants/routes'
 import '../styles/my-profile.css'
 
@@ -47,6 +52,9 @@ export default function MyProfile({ navigate }) {
   })
   const [saving, setSaving] = useState(false)
   const [saveNotice, setSaveNotice] = useState(null) // { type, message }
+  const [leetcodeStats, setLeetcodeStats] = useState(null)
+  const [refreshingStats, setRefreshingStats] = useState(false)
+  const [statsNotice, setStatsNotice] = useState(null) // { type, message }
 
   // ── Load profile on mount (once auth is ready) ──
   const loadProfile = useCallback(async () => {
@@ -70,6 +78,13 @@ export default function MyProfile({ navigate }) {
         graduation_year: data.graduation_year || '',
         leetcode_username: data.leetcode_username || '',
       })
+
+      const { data: stats, error: statsError } = await getLeetcodeStats(data.id)
+      if (statsError) {
+        setStatsNotice({ type: 'error', message: statsError.message || 'Failed to load LeetCode stats.' })
+      } else {
+        setLeetcodeStats(stats)
+      }
     }
     setLoadingProfile(false)
   }, [])
@@ -130,6 +145,46 @@ export default function MyProfile({ navigate }) {
     setProfile(data)
     setSaveNotice({ type: 'success', message: 'Profile saved successfully!' })
   }
+
+  async function handleRefreshStats() {
+    setStatsNotice(null)
+    setRefreshingStats(true)
+
+    try {
+      const { data, error } = await refreshMyLeetcodeStats()
+      if (error) {
+        setStatsNotice({
+          type: 'error',
+          message: error.message || 'Could not refresh LeetCode stats. Your last saved stats are unchanged.',
+        })
+        return
+      }
+
+      setLeetcodeStats(data?.stats || null)
+      setStatsNotice({
+        type: 'success',
+        message: data?.cached
+          ? 'Your recent LeetCode stats are up to date.'
+          : 'LeetCode stats refreshed successfully.',
+      })
+    } catch (error) {
+      setStatsNotice({
+        type: 'error',
+        message: error instanceof Error
+          ? error.message
+          : 'Could not refresh LeetCode stats. Your last saved stats are unchanged.',
+      })
+    } finally {
+      setRefreshingStats(false)
+    }
+  }
+
+  const savedUsernameMatchesForm =
+    form.leetcode_username.trim().toLowerCase() ===
+    (profile?.leetcode_username || '').trim().toLowerCase()
+  const statsMatchCurrentUsername =
+    leetcodeStats?.provider_username?.toLowerCase() ===
+    (profile?.leetcode_username || '').trim().toLowerCase()
 
   // ── Not signed in ──
   if (!authLoading && !user) {
@@ -361,6 +416,55 @@ export default function MyProfile({ navigate }) {
                   Your LeetCode handle — used to fetch your solve stats for the leaderboard.
                 </span>
               </div>
+
+              <section className="form-group" aria-labelledby="leetcode-stats-title">
+                <h2 id="leetcode-stats-title" className="form-label">LeetCode Statistics</h2>
+                <p className="myprofile-field-hint">
+                  Stats are refreshed securely by the server. CPHub never asks for your LeetCode password or session.
+                </p>
+                {statsMatchCurrentUsername ? (
+                  <>
+                    <div className="myprofile-meta-row">
+                      <span>Total solved: <strong>{leetcodeStats.solved_total.toLocaleString()}</strong></span>
+                      <span>Easy: {leetcodeStats.easy_solved.toLocaleString()}</span>
+                      <span>Medium: {leetcodeStats.medium_solved.toLocaleString()}</span>
+                      <span>Hard: {leetcodeStats.hard_solved.toLocaleString()}</span>
+                    </div>
+                    {leetcodeStats.fetched_at && (
+                      <p className="myprofile-field-hint">
+                        Last successful fetch: {new Date(leetcodeStats.fetched_at).toLocaleString()}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="myprofile-field-hint">
+                    No saved stats are available for this LeetCode username yet.
+                  </p>
+                )}
+                <button
+                  type="button"
+                  className="auth-submit-btn"
+                  onClick={handleRefreshStats}
+                  disabled={
+                    refreshingStats ||
+                    saving ||
+                    !profile?.leetcode_username ||
+                    !savedUsernameMatchesForm
+                  }
+                >
+                  {refreshingStats ? 'Refreshing…' : 'Refresh LeetCode Stats'}
+                </button>
+                {!savedUsernameMatchesForm && (
+                  <p className="myprofile-field-hint">
+                    Save your updated LeetCode username before refreshing.
+                  </p>
+                )}
+                {statsNotice && (
+                  <div className={`auth-notice-box ${statsNotice.type}`} role="status">
+                    <p style={{ margin: 0 }}>{statsNotice.message}</p>
+                  </div>
+                )}
+              </section>
 
               {/* Timestamps (read-only info) */}
               {profile?.created_at && (

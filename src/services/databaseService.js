@@ -145,36 +145,18 @@ export async function getLeetcodeStats(userId) {
     .from('leetcode_stats')
     .select('*')
     .eq('user_id', userId)
-    .single()
+    .maybeSingle()
 
   return { data, error }
 }
 
 /**
- * Upserts LeetCode stats for the current user.
- * Creates the row if it doesn't exist, updates it if it does.
- * @param {Object} stats - { solved_total, easy_solved, medium_solved, hard_solved, submission_calendar?, fetch_status? }
+ * Requests a server-side LeetCode refresh for the signed-in user.
+ * The browser sends no LeetCode request or credentials.
  */
-export async function upsertMyLeetcodeStats(stats) {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { data: null, error: { message: 'Not signed in' } }
-
-  const row = {
-    user_id: user.id,
-    solved_total: stats.solved_total ?? 0,
-    easy_solved: stats.easy_solved ?? 0,
-    medium_solved: stats.medium_solved ?? 0,
-    hard_solved: stats.hard_solved ?? 0,
-    submission_calendar: stats.submission_calendar ?? {},
-    fetched_at: new Date().toISOString(),
-    fetch_status: stats.fetch_status ?? 'success',
-  }
-
-  const { data, error } = await supabase
-    .from('leetcode_stats')
-    .upsert(row, { onConflict: 'user_id' })
-    .select()
-    .single()
-
+export async function refreshMyLeetcodeStats() {
+  const { data, error } = await supabase.functions.invoke('leetcode-refresh', {
+    body: {},
+  })
   return { data, error }
 }
