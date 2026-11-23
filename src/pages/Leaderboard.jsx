@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from 'react'
-import branchesData from '../data/branches.json'
+import { useEffect, useState } from 'react'
 import FloatingNavbar from '../components/layout/FloatingNavbar'
 import LeaderboardHeader from '../components/leaderboard/LeaderboardHeader'
 import LeaderboardPodium from '../components/leaderboard/LeaderboardPodium'
 import LeaderboardFilters from '../components/leaderboard/LeaderboardFilters'
 import LeaderboardTable from '../components/leaderboard/LeaderboardTable'
 import ClosingCTA from '../components/layout/ClosingCTA'
-import { getLeaderboard } from '../services/databaseService'
+import { getLeaderboard } from '../services/leaderboardApi'
+import { getApiErrorMessage } from '../services/api'
+import { getBranchOptions } from '../services/profileApi'
 import '../styles/leaderboard.css'
 
 const PAGE_SIZE = 20
@@ -18,19 +19,50 @@ export default function Leaderboard({ navigate }) {
   const [sortBy, setSortBy] = useState('total_solved')
   const [sortOrder, setSortOrder] = useState('desc')
   const [currentPage, setCurrentPage] = useState(1)
-  const [leaderboardData, setLeaderboardData] = useState(null)
+  const [leaderboardResult, setLeaderboardResult] = useState(null)
   const [topStudents, setTopStudents] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState('')
+  const [branchOptions, setBranchOptions] = useState([])
+  const [branchOptionsError, setBranchOptionsError] = useState('')
 
-  const branchOptions = useMemo(
-    () => [...new Set(Object.values(branchesData.branch || {}))],
-    [],
-  )
+  const queryKey = JSON.stringify({
+    currentPage,
+    selectedBranch,
+    selectedYear,
+    sortBy,
+    sortOrder,
+    searchQuery,
+  })
+  const currentResult = leaderboardResult?.key === queryKey ? leaderboardResult : null
+  const leaderboardData = currentResult?.data || null
+  const loading = !currentResult
+  const loadError = currentResult?.error || ''
+
+  const branches = branchOptions.length
+    ? branchOptions
+    : leaderboardData?.summary?.available_branches || []
   const students = leaderboardData?.students || []
   const summary = leaderboardData?.summary
   const pagination = leaderboardData?.pagination
   const yearOptions = summary?.available_years || []
+
+  useEffect(() => {
+    let active = true
+    getBranchOptions()
+      .then((options) => {
+        if (active) {
+          setBranchOptions(options)
+          setBranchOptionsError('')
+        }
+      })
+      .catch((error) => {
+        if (active) {
+          setBranchOptionsError(getApiErrorMessage(error, 'Unable to load branch filters.'))
+        }
+      })
+    return () => {
+      active = false
+    }
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -42,28 +74,33 @@ export default function Leaderboard({ navigate }) {
       sortBy,
       sortOrder,
       search: searchQuery,
-    }).then(({ data, error }) => {
-      if (!active) return
-      if (error) {
-        setLoadError(error.message)
-        setLeaderboardData(null)
-      } else {
-        setLoadError('')
-        setLeaderboardData(data)
-      }
-      setLoading(false)
     })
+      .then((data) => {
+        if (active) setLeaderboardResult({ key: queryKey, data, error: '' })
+      })
+      .catch((error) => {
+        if (active) {
+          setLeaderboardResult({
+            key: queryKey,
+            data: null,
+            error: getApiErrorMessage(error, 'Unable to load the leaderboard.'),
+          })
+        }
+      })
 
     return () => {
       active = false
     }
-  }, [currentPage, selectedBranch, selectedYear, sortBy, sortOrder, searchQuery])
+  }, [currentPage, selectedBranch, selectedYear, sortBy, sortOrder, searchQuery, queryKey])
 
   useEffect(() => {
     let active = true
     getLeaderboard({ limit: 3, sortBy: 'total_solved', sortOrder: 'desc' })
-      .then(({ data }) => {
-        if (active && data) setTopStudents(data.students)
+      .then((data) => {
+        if (active) setTopStudents(data.students || [])
+      })
+      .catch(() => {
+        if (active) setTopStudents([])
       })
 
     return () => {
@@ -134,7 +171,7 @@ export default function Leaderboard({ navigate }) {
           <LeaderboardPodium topStudents={topStudents} onNavigate={navigate} />
 
           <LeaderboardFilters
-            branchOptions={branchOptions}
+            branchOptions={branches}
             yearOptions={yearOptions}
             selectedBranch={selectedBranch}
             selectedYear={selectedYear}
@@ -151,6 +188,7 @@ export default function Leaderboard({ navigate }) {
             totalCount={summary?.total_students || 0}
           />
 
+          {branchOptionsError && <p role="alert">{branchOptionsError}</p>}
           {loading && <p role="status">Loading leaderboard…</p>}
           {loadError && <p role="alert">{loadError}</p>}
           {!loading && !loadError && (
@@ -161,6 +199,7 @@ export default function Leaderboard({ navigate }) {
               currentPage={currentPage}
               pageSize={PAGE_SIZE}
               totalCount={pagination?.total || 0}
+              campusStudentCount={summary?.total_students || 0}
               onPageChange={setCurrentPage}
               onSortChange={handleSortChange}
               onResetFilters={handleResetFilters}

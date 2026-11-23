@@ -431,6 +431,26 @@ def _read_profile_username(client: Client, user_id: UUID) -> str:
         ) from None
 
 
+def get_my_cached_leetcode_stats(
+    client: Client,
+    user_id: UUID,
+) -> LeetCodeRefreshResponse:
+    username = _read_profile_username(client, user_id)
+    cached_row = _read_cache(client, user_id)
+    if (
+        not cached_row
+        or cached_row.get("fetch_status") != "success"
+        or str(cached_row.get("provider_username") or "").casefold() != username.casefold()
+    ):
+        return LeetCodeRefreshResponse(success=True, cached=True, data=None)
+    try:
+        stats = _stats_from_cache(cached_row)
+    except (KeyError, TypeError, ValueError):
+        logger.warning("Saved LeetCode stats were incomplete for an existing profile.")
+        return LeetCodeRefreshResponse(success=True, cached=True, data=None)
+    return LeetCodeRefreshResponse(success=True, cached=True, data=stats)
+
+
 def _finish_failed_fetch(
     client: Client,
     username: str,

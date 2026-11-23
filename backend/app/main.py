@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import get_settings
-from app.routes import leaderboard, leetcode, profile
+from app.routes import branches, leaderboard, leetcode, profile
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("cphub.api")
@@ -135,6 +135,7 @@ async def unhandled_exception_handler(
 app.include_router(profile.router, prefix="/api")
 app.include_router(leaderboard.router, prefix="/api")
 app.include_router(leetcode.router, prefix="/api")
+app.include_router(branches.router, prefix="/api")
 
 
 @app.get("/health", response_model=HealthResponse, tags=["health"])

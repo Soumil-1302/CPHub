@@ -137,6 +137,28 @@ class LeaderboardRouteTests(unittest.TestCase):
         self.assertIsNone(student["leetcode_username"])
         self.assertIsNone(student["contest_rating"])
 
+    def test_handles_an_empty_database_result(self) -> None:
+        self.db.payload = {
+            "students": [],
+            "summary": {
+                "total_students": 0,
+                "total_solved": 0,
+                "active_branch_count": 0,
+                "available_branches": [],
+                "available_years": [],
+            },
+            "pagination": {"total": 0, "limit": 20, "offset": 0, "has_more": False},
+        }
+
+        response = self.client.get("/api/leaderboard")
+
+        self.assertEqual(response.status_code, 200, response.text)
+        data = response.json()["data"]
+        self.assertEqual(data["students"], [])
+        self.assertEqual(data["summary"]["total_students"], 0)
+        self.assertEqual(data["summary"]["available_branches"], [])
+        self.assertFalse(data["pagination"]["has_more"])
+
     def test_rejects_unknown_branch(self) -> None:
         response = self.client.get("/api/leaderboard", params={"branch": "unknown"})
 

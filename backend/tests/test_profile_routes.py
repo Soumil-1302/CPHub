@@ -107,15 +107,71 @@ class FakeRpc:
         return SimpleNamespace(data=deepcopy(row))
 
 
+class FakePublicProfileRpc:
+    def __init__(self, client: "FakeSupabaseClient", params: dict[str, object]):
+        self.client = client
+        self.params = params
+
+    def execute(self) -> SimpleNamespace:
+        self.client.last_rpc = "get_public_profile"
+        username = str(self.params["p_username"]).casefold()
+        row = next(
+            (
+                item
+                for item in self.client.profiles.values()
+                if str(item.get("username") or "").casefold() == username
+            ),
+            None,
+        )
+        if row is None:
+            return SimpleNamespace(data=None)
+        leetcode_username = str(row.get("leetcode_username") or "").strip() or None
+        stats = self.client.stats.get(str(row.get("id")), {})
+        if (
+            stats.get("fetch_status") != "success"
+            or str(stats.get("provider_username") or "").casefold()
+            != str(leetcode_username or "").casefold()
+        ):
+            stats = {}
+        return SimpleNamespace(
+            data={
+                "username": row["username"],
+                "display_name": row.get("display_name") or row["username"],
+                "usn": row.get("usn"),
+                "branch": row.get("branch") or "General",
+                "year_of_passing": int(row["graduation_year"]),
+                "leetcode_username": leetcode_username,
+                "leetcode_profile_url": (
+                    f"https://leetcode.com/u/{leetcode_username}/"
+                    if leetcode_username
+                    else None
+                ),
+                "solved_total": stats.get("solved_total", 0),
+                "easy_solved": stats.get("easy_solved", 0),
+                "medium_solved": stats.get("medium_solved", 0),
+                "hard_solved": stats.get("hard_solved", 0),
+                "contest_rating": stats.get("contest_rating"),
+                "global_ranking": stats.get("global_ranking"),
+                "fetched_at": stats.get("fetched_at"),
+                "created_at": row["created_at"],
+                "updated_at": row["updated_at"],
+            }
+        )
+
+
 class FakeSupabaseClient:
     def __init__(self) -> None:
         self.profiles: dict[str, dict[str, object]] = {}
+        self.stats: dict[str, dict[str, object]] = {}
         self.last_selected_columns = ""
+        self.last_rpc = ""
 
     def table(self, name: str) -> FakeQuery:
         return FakeQuery(self, name)
 
-    def rpc(self, _name: str, params: dict[str, object]) -> FakeRpc:
+    def rpc(self, name: str, params: dict[str, object]) -> FakeRpc | FakePublicProfileRpc:
+        if name == "get_public_profile":
+            return FakePublicProfileRpc(self, params)
         return FakeRpc(self, params)
 
 
@@ -313,6 +369,30 @@ class ProfileRouteTests(unittest.TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertEqual(self.db.profiles, {})
 
+    def test_account_b_cannot_update_account_a_profile(self) -> None:
+        self.db.profiles[str(OWNER_ID)] = {
+            "id": str(OWNER_ID),
+            "username": "student_name",
+            "display_name": "Student",
+            "branch": "CSE",
+            "graduation_year": "2028",
+            "leetcode_username": "",
+            "created_at": TIMESTAMP,
+            "updated_at": TIMESTAMP,
+        }
+        app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+            id=OTHER_ID,
+            email="other@dsu.edu.in",
+        )
+
+        response = self.client.put(
+            "/api/profile/me",
+            json={"display_name": "Changed by another account"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(self.db.profiles[str(OWNER_ID)]["display_name"], "Student")
+
     def test_public_profile_does_not_expose_private_fields(self) -> None:
         self.db.profiles[str(OWNER_ID)] = {
             "id": str(OWNER_ID),
@@ -338,8 +418,77 @@ class ProfileRouteTests(unittest.TestCase):
         self.assertNotIn("access_token", payload)
         self.assertNotIn("private@dsu.edu.in", response.text)
         self.assertNotIn("must-not-return", response.text)
-        self.assertNotIn("email", self.db.last_selected_columns)
-        self.assertNotIn("access_token", self.db.last_selected_columns)
+        self.assertEqual(self.db.last_rpc, "get_public_profile")
+        self.assertEqual(self.db.last_selected_columns, "")
+
+    def test_account_b_can_view_account_a_public_profile_and_cached_stats(self) -> None:
+        self.db.profiles[str(OWNER_ID)] = {
+            "id": str(OWNER_ID),
+            "username": "student_name",
+            "display_name": "Student",
+            "branch": "CSE",
+            "graduation_year": "2028",
+            "leetcode_username": "student_handle",
+            "created_at": TIMESTAMP,
+            "updated_at": TIMESTAMP,
+        }
+        self.db.stats[str(OWNER_ID)] = {
+            "provider_username": "student_handle",
+            "fetch_status": "success",
+            "solved_total": 20,
+            "easy_solved": 8,
+            "medium_solved": 9,
+            "hard_solved": 3,
+            "contest_rating": 1420.5,
+            "global_ranking": 12345,
+            "fetched_at": TIMESTAMP,
+            "submission_calendar": {"private": "not returned"},
+        }
+        app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+            id=OTHER_ID,
+            email="other@dsu.edu.in",
+        )
+
+        response = self.client.get("/api/profile/student_name")
+
+        self.assertEqual(response.status_code, 200, response.text)
+        payload = response.json()
+        self.assertEqual(payload["username"], "student_name")
+        self.assertEqual(payload["solved_total"], 20)
+        self.assertEqual(payload["easy_solved"], 8)
+        self.assertEqual(payload["contest_rating"], 1420.5)
+        self.assertNotIn("user_id", payload)
+        self.assertNotIn("email", payload)
+        self.assertNotIn("submission_calendar", payload)
+
+    def test_public_profile_returns_not_found_without_disclosing_data(self) -> None:
+        response = self.client.get("/api/profile/missing_student")
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["error"]["code"], "profile_not_found")
+
+    def test_security_migration_restricts_base_tables_and_projects_public_profile(self) -> None:
+        migration_path = (
+            Path(__file__).resolve().parents[2]
+            / "Frontend"
+            / "supabase"
+            / "migrations"
+            / "006_secure_public_profile_access.sql"
+        )
+        migration = migration_path.read_text(encoding="utf-8").lower()
+
+        self.assertIn("revoke all on table public.profiles from public, anon, authenticated", migration)
+        self.assertIn(
+            "revoke all on table public.leetcode_stats from public, anon, authenticated",
+            migration,
+        )
+        self.assertIn("using (auth.uid() = id)", migration)
+        self.assertIn("using (auth.uid() = user_id)", migration)
+        self.assertIn("create or replace function public.get_public_profile", migration)
+        self.assertIn("security definer", migration)
+        self.assertIn("to anon, authenticated", migration)
+        self.assertNotIn("'email'", migration)
+        self.assertNotIn("'user_id'", migration)
 
     def test_migration_adds_username_without_changing_existing_rls_policies(self) -> None:
         migration_path = (

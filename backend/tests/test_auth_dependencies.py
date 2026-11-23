@@ -105,10 +105,15 @@ class SupabaseAuthenticationDependencyTests(unittest.TestCase):
         self.assertNotIn("expired-access-token", response.text)
 
     def test_missing_bearer_token_returns_401_without_contacting_supabase(self) -> None:
-        response = self.client.get("/api/profile/me")
+        for method, path in (
+            (self.client.get, "/api/profile/me"),
+            (self.client.post, "/api/leetcode/refresh"),
+        ):
+            with self.subTest(path=path):
+                response = method(path)
 
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.json()["error"]["code"], "unauthorized")
+                self.assertEqual(response.status_code, 401)
+                self.assertEqual(response.json()["error"]["code"], "unauthorized")
         self.create_auth_client.assert_not_called()
 
     def test_non_bearer_authorization_returns_401(self) -> None:

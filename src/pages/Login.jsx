@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import FloatingNavbar from '../components/layout/FloatingNavbar'
 import { useAuth } from '../context/AuthContext'
 import {
@@ -74,25 +74,6 @@ export default function Login({ navigate }) {
       clearTimeout(timeout)
     }
   }, [cooldownExpirations])
-
-  // ── USN detection (preserved from original) ──
-  const detectedCohort = useMemo(() => {
-    if (!email) return null
-    const clean = email.toLowerCase().trim()
-    const usnMatch =
-      clean.match(/^eng(\d{2})([a-z]{2})\d+@/i) ||
-      clean.match(/^eng(\d{2})([a-z]{2})\d+$/i)
-    if (usnMatch) {
-      const branchNames = {
-        ct: 'CST', am: 'AI&ML', cy: 'CYBER', cs: 'CSE', ad: 'AI&DS',
-        ds: 'DataSci', ec: 'ECE', ra: 'ROBOTICS', as: 'AEROSPACE', me: 'MECH',
-      }
-      const branch = branchNames[usnMatch[2]] || usnMatch[2].toUpperCase()
-      const startYear = 2000 + parseInt(usnMatch[1], 10)
-      return { branch, batch: `${startYear}–${startYear + 4}` }
-    }
-    return null
-  }, [email])
 
   // ── If already signed in, show a signed-in state ──
   if (user && authMode !== 'update-password') {
@@ -393,12 +374,6 @@ export default function Login({ navigate }) {
     }
   }
 
-  // ── Quick-fill for demo ──
-  function handleQuickFill(usn) {
-    setEmail(`${usn}@${defaultEmailDomain}`)
-    setNotice(null)
-  }
-
   // ────────────────────────────────────────────────
   // Render
   // ────────────────────────────────────────────────
@@ -464,11 +439,6 @@ export default function Login({ navigate }) {
                     <label htmlFor="university-email" className="form-label">
                       University Email
                     </label>
-                    {detectedCohort && (
-                      <span className="domain-detection-pill" title="Verified Campus Cohort">
-                        ✓ {detectedCohort.branch} · {detectedCohort.batch}
-                      </span>
-                    )}
                   </div>
                   <div className="form-input-wrapper">
                     <input
@@ -707,36 +677,6 @@ export default function Login({ navigate }) {
             {notice && (
               <div className={`auth-notice-box ${notice.type}`} role="alert">
                 <p style={{ margin: 0 }}>{notice.message}</p>
-              </div>
-            )}
-
-            {/* ═══════════════ QUICK DEMO (email step only) ═══════════════ */}
-            {authMode === 'otp' && step === 'email' && (
-              <div className="auth-demo-picker">
-                <div className="demo-picker-title">
-                  <span>Quick Test Cohorts</span>
-                  <span style={{ fontSize: '11px', textTransform: 'none', color: '#94a3b8' }}>
-                    Click to auto-fill
-                  </span>
-                </div>
-                <div className="demo-students-grid">
-                  <button
-                    type="button"
-                    className="demo-student-chip"
-                    onClick={() => handleQuickFill('eng25ct0060')}
-                  >
-                    <span><strong>Aarav Sharma</strong> · @aarav_codes</span>
-                    <span className="demo-student-rank">CST · Rank #1</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="demo-student-chip"
-                    onClick={() => handleQuickFill('eng24cs0061')}
-                  >
-                    <span><strong>Ananya Rao</strong> · @ananya_dev</span>
-                    <span className="demo-student-rank">CSE · Rank #2</span>
-                  </button>
-                </div>
               </div>
             )}
 

@@ -20,7 +20,7 @@ export default function ProfileNotFound({ identifier = '', onNavigate }) {
       </h1>
 
       <p className="not-found-desc">
-        We could not locate any student matching that username or USN in the registered Dayananda Sagar University competitive programming roster.
+        We could not find a registered CPHub student profile for this username.
       </p>
 
       <div className="not-found-actions">
@@ -41,32 +41,6 @@ export default function ProfileNotFound({ identifier = '', onNavigate }) {
         </button>
       </div>
 
-      <div className="not-found-suggestions">
-        <span className="suggestions-label">Try exploring these active campus leaders:</span>
-        <div className="suggestions-chips">
-          <button
-            type="button"
-            className="suggestion-chip"
-            onClick={() => onNavigate && onNavigate(ROUTES.profile('aarav_codes'))}
-          >
-            🥇 Aarav Sharma (@aarav_codes)
-          </button>
-          <button
-            type="button"
-            className="suggestion-chip"
-            onClick={() => onNavigate && onNavigate(ROUTES.profile('ananya_dev'))}
-          >
-            🥈 Ananya Rao (@ananya_dev)
-          </button>
-          <button
-            type="button"
-            className="suggestion-chip"
-            onClick={() => onNavigate && onNavigate(ROUTES.profile('rohan_algo'))}
-          >
-            🥉 Rohan Iyer (@rohan_algo)
-          </button>
-        </div>
-      </div>
     </div>
   )
 }

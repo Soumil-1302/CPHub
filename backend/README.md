@@ -29,8 +29,9 @@ project's server-side API settings; do not copy it to any frontend config.
 The health endpoint and Swagger UI work without Supabase credentials.
 Protected routes validate the bearer access token against Supabase Auth using
 `SUPABASE_URL` and `SUPABASE_ANON_KEY`. The service-role key is kept in a
-separate server-only client for profile and LeetCode cache operations. Public profile
-reads use the anon client and the existing public-read RLS policy. The
+separate server-only client for profile and LeetCode cache operations. Public
+profile reads use a narrowly projected database RPC; direct table reads are
+restricted to the authenticated owner. The
 service-role key must never be put in React, a `VITE_*` variable, API
 responses, or logs. `.env` is ignored by Git.
 
@@ -44,8 +45,8 @@ Authorization: Bearer <supabase-session-access-token>
 FastAPI asks Supabase Auth to validate that token and uses only the returned
 Auth user UUID as the authenticated identity. Protected profile writes must
 use that identity as the row owner; a client-supplied user ID must never
-determine write ownership. The profile endpoints and LeetCode refresh endpoint are implemented; the
-leaderboard route remains an unimplemented scaffold.
+determine write ownership. Profile, leaderboard, branch catalogue, and LeetCode refresh endpoints are
+implemented.
 
 Authentication failures return the same generic 401 response for missing,
 malformed, invalid, and expired tokens. Supabase/network availability failures
@@ -88,7 +89,7 @@ Supported query parameters:
 
 | Parameter | Behavior |
 |---|---|
-| `branch` | Branch name or code from `Frontend/src/data/branches.json`. |
+| `branch` | A branch name or code supported by the backend branch catalogue. |
 | `year` | Four-digit year of passing. |
 | `sort_by` | `total_solved`, `easy_solved`, `medium_solved`, `hard_solved`, `contest_rating`, or `name`. |
 | `sort_order` | `asc` or `desc`. |
@@ -100,13 +101,24 @@ The response's student entries retain the frontend's public keys (`username`,
 `name`, `usn`, `branch`, `year`, `leetcode`, and `total`) and include breakdown,
 rank, and optional rating fields. Summary and pagination metadata are returned
 alongside the student list. Email addresses, Auth IDs, and credentials are
-never selected or returned. The existing leaderboard page uses this endpoint
-and no longer loads `students.json`.
+never selected or returned. The existing leaderboard page uses this endpoint.
+`GET /api/branches` provides the canonical branch choices independently of
+student records, so filters and onboarding remain usable when the database is
+empty.
 
 Apply `Frontend/supabase/migrations/005_public_leaderboard.sql` after migrations
-001–004. It creates a security-invoker RPC, so existing public-read RLS
-policies remain in effect, and adds indexes for leaderboard filters and
-supported numeric sorts.
+001–004. It creates the leaderboard RPC with an explicit public projection and
+adds indexes for leaderboard filters and supported numeric sorts.
+
+Then apply `Frontend/supabase/migrations/006_secure_public_profile_access.sql`
+in the Supabase Dashboard SQL Editor. This migration removes anonymous access
+to the underlying `profiles` and `leetcode_stats` tables, restricts direct
+authenticated reads to each user's own rows, and leaves RLS enabled. Public
+profile and leaderboard reads continue through narrowly projected RPCs; those
+functions do not return profile IDs, email addresses, or private statistics.
+Run the complete migration file after 005 and verify it succeeds before
+deploying this backend version. The migration is also mirrored at
+`supabase/migrations/006_secure_public_profile_access.sql`.
 
 ### LeetCode statistics
 
@@ -148,8 +160,7 @@ or any server credential in a `VITE_*` variable.
 Profile email is read from the validated Supabase Auth user and is not copied
 into the public profiles table. LeetCode URLs are validated and converted to
 the existing `leetcode_username` field. Branch names/codes are validated
-against `Frontend/src/data/branches.json`; keep that shared data file available
-when deploying the backend.
+against the backend branch catalogue; no frontend data file is required.
 
 ## Database migration
 

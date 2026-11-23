@@ -45,9 +45,9 @@ export default function ProfileHeader({ profileData, onNavigate }) {
           <span
             className="profile-rank-chip"
             style={rankBadgeStyle}
-            title={`Campus Rank #${campusRank}`}
+            title={campusRank ? `Campus Rank #${campusRank}` : 'Campus rank unavailable'}
           >
-            #{campusRank}
+            {campusRank ? `#${campusRank}` : '—'}
           </span>
         </div>
 
@@ -60,7 +60,7 @@ export default function ProfileHeader({ profileData, onNavigate }) {
           <p className="profile-affiliation-line">
             <span className="affiliation-org">Dayananda Sagar University</span>
             <span className="bullet-sep" aria-hidden="true">•</span>
-            <span className="affiliation-usn">{student.usn}</span>
+            <span className="affiliation-usn">{student.usn || 'USN not provided'}</span>
           </p>
 
           <div className="profile-tags-row">
@@ -85,24 +85,24 @@ export default function ProfileHeader({ profileData, onNavigate }) {
         <div className="quick-stat-box">
           <span className="stat-box-label">Campus Standing</span>
           <div className="stat-box-val-row">
-            <span className="stat-box-val">#{campusRank}</span>
-            <span className="stat-box-sub">of {totalStudents} coders</span>
+            <span className="stat-box-val">{campusRank ? `#${campusRank}` : '—'}</span>
+            <span className="stat-box-sub">{totalStudents ? `of ${totalStudents} coders` : 'Rank unavailable'}</span>
           </div>
         </div>
 
         <div className="quick-stat-box">
           <span className="stat-box-label">Department Rank</span>
           <div className="stat-box-val-row">
-            <span className="stat-box-val">#{deptRank}</span>
-            <span className="stat-box-sub">of {deptTotal} in {student.branchDisplay || 'Dept'}</span>
+            <span className="stat-box-val">{deptRank ? `#${deptRank}` : '—'}</span>
+            <span className="stat-box-sub">{deptTotal ? `of ${deptTotal} in ${student.branchDisplay || 'Dept'}` : 'Rank unavailable'}</span>
           </div>
         </div>
 
         <div className="quick-stat-box">
           <span className="stat-box-label">Batch Rank</span>
           <div className="stat-box-val-row">
-            <span className="stat-box-val">#{batchRank}</span>
-            <span className="stat-box-sub">of {batchTotal} in {student.year || 'Batch'}</span>
+            <span className="stat-box-val">{batchRank ? `#${batchRank}` : '—'}</span>
+            <span className="stat-box-sub">{batchTotal ? `of ${batchTotal} in ${student.year || 'Batch'}` : 'Rank unavailable'}</span>
           </div>
         </div>
 
@@ -112,7 +112,7 @@ export default function ProfileHeader({ profileData, onNavigate }) {
             <span className="stat-box-val stat-val-accent">
               {(student.totalSolved || 0).toLocaleString()}
             </span>
-            <span className="stat-box-sub">Campus Dataset</span>
+            <span className="stat-box-sub">Cached LeetCode stats</span>
           </div>
         </div>
       </div>

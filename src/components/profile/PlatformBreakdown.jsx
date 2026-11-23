@@ -1,8 +1,8 @@
 export default function PlatformBreakdown({ profileData }) {
   const { student, lcTotal, lcEasy, lcMedium, lcHard } = profileData
 
-  const username = student.username || ''
-  const leetcodeUrl = `https://leetcode.com/u/${username}`
+  const username = student.leetcode_username || ''
+  const leetcodeUrl = profileData.leetcode_profile_url || `https://leetcode.com/u/${username}`
 
   const lcEasyPct = lcTotal > 0 ? Math.round((lcEasy / lcTotal) * 100) : 0
   const lcMedPct = lcTotal > 0 ? Math.round((lcMedium / lcTotal) * 100) : 0
@@ -28,17 +28,19 @@ export default function PlatformBreakdown({ profileData }) {
               </div>
             </div>
 
-            <a
-              href={leetcodeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="platform-external-btn"
-              title={`Open LeetCode profile for @${username}`}
-              aria-label={`Open LeetCode profile for ${username}`}
-            >
-              <span>Profile</span>
-              <span aria-hidden="true">↗</span>
-            </a>
+            {username && (
+              <a
+                href={leetcodeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="platform-external-btn"
+                title={`Open LeetCode profile for @${username}`}
+                aria-label={`Open LeetCode profile for ${username}`}
+              >
+                <span>Profile</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            )}
           </div>
 
           <div className="platform-headline-metric">
@@ -97,7 +99,9 @@ export default function PlatformBreakdown({ profileData }) {
 
           <div className="platform-card-footer">
             <span className="platform-footer-tip">
-              LeetCode solve count recorded in the campus student dataset.
+              {profileData.fetched_at
+                ? `Statistics last refreshed ${new Date(profileData.fetched_at).toLocaleDateString()}.`
+                : 'No cached LeetCode statistics are available yet.'}
             </span>
           </div>
         </div>

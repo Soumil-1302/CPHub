@@ -9,9 +9,28 @@ from app.dependencies import (
     get_supabase_admin_client,
 )
 from app.schemas.leetcode import LeetCodeRefreshResponse, RefreshError
-from app.services.leetcode_service import refresh_my_leetcode_stats
+from app.services.leetcode_service import (
+    get_my_cached_leetcode_stats,
+    refresh_my_leetcode_stats,
+)
 
 router = APIRouter(prefix="/leetcode", tags=["leetcode"])
+
+
+@router.get(
+    "/me",
+    response_model=LeetCodeRefreshResponse,
+    responses={
+        400: {"description": "A LeetCode username has not been added to the profile."},
+        401: {"description": "A valid Supabase access token is required."},
+        503: {"description": "Cached statistics are temporarily unavailable."},
+    },
+)
+def get_my_leetcode_stats(
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    client: Client = Depends(get_supabase_admin_client),
+) -> LeetCodeRefreshResponse:
+    return get_my_cached_leetcode_stats(client, current_user.id)
 
 
 @router.post(

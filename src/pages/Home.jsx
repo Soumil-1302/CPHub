@@ -1,6 +1,4 @@
-import { useMemo } from 'react'
-import studentsData from '../data/students.json'
-import branchesData from '../data/branches.json'
+import { useEffect, useState } from 'react'
 import FloatingNavbar from '../components/layout/FloatingNavbar'
 import HeroSection from '../components/home/HeroSection'
 import CommunitySnapshot from '../components/home/CommunitySnapshot'
@@ -8,28 +6,36 @@ import PlatformShowcase from '../components/home/PlatformShowcase'
 import LeaderboardPreview from '../components/home/LeaderboardPreview'
 import ContestsCommunity from '../components/home/ContestsCommunity'
 import ClosingCTA from '../components/layout/ClosingCTA'
-import {
-  normalizeStudentsData,
-  getBranchList,
-  calculateCampusStats,
-} from '../utils/studentAnalytics'
+import { getLeaderboard } from '../services/leaderboardApi'
+import { getApiErrorMessage } from '../services/api'
 import '../styles/home.css'
 
 export default function Home({ navigate }) {
-  // Normalize students data
-  const studentsList = useMemo(() => {
-    return normalizeStudentsData(studentsData)
+  const [summary, setSummary] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let active = true
+    getLeaderboard({ limit: 1 })
+      .then((result) => {
+        if (active) setSummary(result.summary)
+      })
+      .catch((requestError) => {
+        if (active) setError(getApiErrorMessage(requestError, 'Unable to load campus statistics.'))
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
   }, [])
 
-  // Process unique branch list
-  const branchList = useMemo(() => {
-    return getBranchList(branchesData)
-  }, [])
-
-  // Compute campus metrics
-  const campusStats = useMemo(() => {
-    return calculateCampusStats(studentsList)
-  }, [studentsList])
+  const totalStudents = summary?.total_students || 0
+  const totalSolved = summary?.total_solved || 0
+  const branches = summary?.available_branches || []
 
   return (
     <div className="cphub-home">
@@ -41,21 +47,23 @@ export default function Home({ navigate }) {
         <HeroSection onNavigate={navigate} />
 
         {/* Section C: Community Snapshot with Asymmetrical Cards */}
+        {loading && <p role="status">Loading campus statistics…</p>}
+        {error && <p role="alert">{error}</p>}
         <CommunitySnapshot
-          totalStudents={campusStats.totalStudents}
-          totalSolved={campusStats.totalSolved}
-          branches={branchList}
+          totalStudents={totalStudents}
+          totalSolved={totalSolved}
+          branches={branches}
+          showEmptyState={!loading && !error && totalStudents === 0}
         />
 
         {/* Section D: LeetCode Platform Showcase */}
         <PlatformShowcase
           onNavigate={navigate}
-          totalLc={campusStats.totalSolved}
+          totalLc={totalSolved}
         />
 
         {/* Section E: Live Leaderboard Preview Table */}
         <LeaderboardPreview
-          students={studentsList}
           onNavigate={navigate}
         />
 

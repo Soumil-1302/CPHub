@@ -9,12 +9,14 @@ export default function ProfileComparison({ profileData }) {
           <div>
             <h2 className="comparison-title">Campus LeetCode Benchmark</h2>
             <p className="comparison-desc">
-              How {student.name}&apos;s LeetCode solve count compares with {totalStudents} students in the campus dataset.
+              {totalStudents
+                ? `How ${student.name}'s LeetCode solve count compares with ${totalStudents} students.`
+                : 'Campus ranking data is not available yet. Cached LeetCode statistics are shown above.'}
             </p>
           </div>
 
           <div className="percentile-badge">
-            <span className="percentile-num">Top {campusPercentile}%</span>
+            <span className="percentile-num">{campusPercentile ? `Top ${campusPercentile}%` : '—'}</span>
             <span className="percentile-label">Campus Standing</span>
           </div>
         </div>
@@ -53,7 +55,9 @@ export default function ProfileComparison({ profileData }) {
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
           <span>
-            Campus rank #{campusRank} is calculated from LeetCode solve counts in the student dataset.
+            {campusRank
+              ? `Campus rank #${campusRank} is calculated from cached LeetCode solve counts.`
+              : 'Campus ranking is not available for this profile yet.'}
           </span>
         </div>
       </div>

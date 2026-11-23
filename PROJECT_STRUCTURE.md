@@ -10,9 +10,8 @@ This document provides a comprehensive overview of the design patterns, architec
 | :--- | :--- | :--- |
 | `src/constants/` | Global immutable values, route paths, navigation links | Includes centralized authentication and OTP configuration (`auth.js`). |
 | `src/context/` | Application-wide React state | `AuthContext.jsx` restores the Supabase session and exposes auth state/sign-out. |
-| `src/data/` | Static JSON data sources | Contains `students.json` (100 students) and `branches.json`. |
-| `src/services/` | External API integrations & network requests | `authService.js` binds the testable auth core to Supabase; the core is unit-tested with mocked Auth methods. |
-| `src/utils/` | Pure business logic, data calculations, algorithms | Includes OTP cooldown/request-lock controls and student analytics. |
+| `src/services/` | External API integrations & network requests | Supabase Auth and centralized FastAPI profile, leaderboard, and LeetCode requests. |
+| `src/utils/` | Pure business logic, data calculations, algorithms | Includes OTP cooldown/request-lock controls; student-facing pages use database-backed API data. |
 | `src/components/common/` | Universally shared presentational widgets | e.g. `BackgroundEffects.jsx` ambient background. |
 | `src/components/layout/` | Structural layout and navigation elements | `FloatingNavbar.jsx`, `ClosingCTA.jsx`. |
 | `src/components/cursor/` | Physics-driven animated cursor system | `MagicCursor.jsx` and user-facing `CursorController.jsx`. |
@@ -80,18 +79,13 @@ This document provides a comprehensive overview of the design patterns, architec
   methods and do not send email. A live Supabase integration test is not run by
   the local suite.
 
-### 2.2 Student Data Normalization, Ranking & Profile Analytics (`src/utils/studentAnalytics.js`)
+### 2.2 Student Data
 
-Centralized, zero-dependency business logic functions:
-
-- **`normalizeStudentsData(rawData)`**: Normalizes both array-based and object-keyed USN representations into a standardized student array.
-- **`resolveBranchName(branchVal, branchMap)`**: Maps department codes (`ct`, `cs`, `am`, etc.) to official branch names (`CST`, `CSE`, `AI&ML`, etc.).
-- **`getBranchList(branchesData)`**: Extracts the unique set of active university engineering departments.
-- **`getYearOptions(studentsList)`**: Determines distinct student graduation cohorts, sorted descending.
-- **`calculateCampusStats(studentsList, branchMap)`**: Computes aggregated campus statistics (student count, LeetCode solves, active department count).
-- **`processLeaderboardStudents(studentsList, filters, branchMap)`**: Executes multi-criteria filtering (department, batch year, search query), ranks by LeetCode solves with a name tie-breaker, and assigns dynamic 1-based ranks.
-- **`getStudentByIdentifier(studentsList, identifier)`**: Resolves a student by username or USN case-insensitively.
-- **`computeStudentProfileData(student, studentsList, branchMap)`**: Computes overall campus rank, department rank, cohort/batch rank, LeetCode difficulty breakdown (Easy, Medium, Hard), and earned campus honor badges.
+Home, Leaderboard, and Profile request real profiles and cached LeetCode
+statistics from FastAPI. The backend queries Supabase and returns public fields
+only. Leaderboard filters and pagination are database-backed, and branch
+choices come from the backend catalogue. Empty database results are rendered
+as empty states rather than replaced with fixture records.
 
 ### 2.3 Navigation & Routing Architecture (`src/constants/routes.js`)
 
@@ -121,8 +115,7 @@ Dynamic route patterns in `App.jsx` parse direct URLs such as `/profile/:usernam
      password recovery.
    - Passwordless university email OTP sign-in and verification.
    - University email domain validation and per-email resend cooldown.
-   - Instant department and batch detection badge from USN format.
-   - Quick demo student fill chips (Aarav Sharma, Ananya Rao).
+   - University email domain validation and password/OTP authentication.
 
 2. **Leaderboard (`/leaderboard` via `src/pages/Leaderboard.jsx` & `src/styles/leaderboard.css`)**:
    - Header with active student count, LeetCode solve count, and active departments.

@@ -42,6 +42,25 @@ class LeetCodeRouteTests(unittest.TestCase):
         self.assertEqual(response.json(), expected.model_dump(mode="json"))
         refresh.assert_called_once_with(self.db, USER_ID, 7200)
 
+    def test_refresh_ignores_client_supplied_owner_id(self) -> None:
+        account_b_id = UUID("b1d6b485-637f-461e-a2e4-e0ce6961c271")
+        app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+            id=account_b_id,
+            email="student-b@dsu.edu.in",
+        )
+        expected = LeetCodeRefreshResponse(success=True, cached=True)
+        with patch(
+            "app.routes.leetcode.refresh_my_leetcode_stats",
+            return_value=(expected, 200),
+        ) as refresh:
+            response = self.client.post(
+                "/api/leetcode/refresh",
+                params={"user_id": str(USER_ID)},
+            )
+
+        self.assertEqual(response.status_code, 200, response.text)
+        refresh.assert_called_once_with(self.db, account_b_id, 7200)
+
     def test_old_versioned_refresh_path_is_not_registered(self) -> None:
         response = self.client.post("/api/v1/leetcode/refresh")
 

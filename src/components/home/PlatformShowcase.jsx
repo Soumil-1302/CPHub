@@ -1,4 +1,4 @@
-export default function PlatformShowcase({ onNavigate, totalLc = 43099 }) {
+export default function PlatformShowcase({ onNavigate, totalLc = 0 }) {
   return (
     <section className="cphub-platforms-section" aria-label="Platforms Showcase">
       <div className="cphub-container">
@@ -11,7 +11,7 @@ export default function PlatformShowcase({ onNavigate, totalLc = 43099 }) {
             Your progress. <span className="italic-serif">One campus leaderboard.</span>
           </h2>
           <p className="section-desc-editorial" style={{ margin: '0 auto' }}>
-            Explore LeetCode practice totals and difficulty breakdowns across the campus dataset.
+            Explore cached LeetCode practice totals from completed student profiles.
           </p>
         </div>
 
@@ -46,33 +46,14 @@ export default function PlatformShowcase({ onNavigate, totalLc = 43099 }) {
                 your daily consistency against top campus performers.
               </p>
 
-              {/* Difficulty Breakdown Visual */}
+              {/* Cached statistics summary */}
               <div className="lc-breakdown-box">
-                <div className="lc-breakdown-title">Estimated Campus Difficulty Distribution</div>
-
-                <div className="lc-diff-row">
-                  <span className="diff-name diff-easy">
-                    <span className="difficulty-dot" style={{ background: '#16a34a' }} />
-                    Easy Problems
-                  </span>
-                  <span className="diff-count">~18,100 (42%)</span>
-                </div>
-
-                <div className="lc-diff-row">
-                  <span className="diff-name diff-medium">
-                    <span className="difficulty-dot" style={{ background: '#d97706' }} />
-                    Medium Problems
-                  </span>
-                  <span className="diff-count">~19,820 (46%)</span>
-                </div>
-
-                <div className="lc-diff-row">
-                  <span className="diff-name diff-hard">
-                    <span className="difficulty-dot" style={{ background: '#dc2626' }} />
-                    Hard Problems
-                  </span>
-                  <span className="diff-count">~5,179 (12%)</span>
-                </div>
+                <div className="lc-breakdown-title">Verified campus statistics</div>
+                <p className="platform-desc">
+                  {totalLc > 0
+                    ? `${totalLc.toLocaleString()} problems solved across cached student profiles.`
+                    : 'No cached LeetCode statistics are available yet.'}
+                </p>
               </div>
             </div>
 

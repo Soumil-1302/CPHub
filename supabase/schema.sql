@@ -121,16 +121,18 @@ create trigger on_auth_user_created
 -- 6. ROW LEVEL SECURITY
 -- ────────────────────────────────────────
 
--- Profiles: anyone can read (leaderboard is public), only owner can update
+-- Public reads use narrow API functions; base-table access is owner-only.
 alter table public.profiles enable row level security;
 
 drop policy if exists "Profiles are viewable by everyone"    on public.profiles;
 drop policy if exists "Users can update their own profile"   on public.profiles;
 drop policy if exists "Users can insert their own profile"   on public.profiles;
+drop policy if exists "Users can view their own profile"     on public.profiles;
 
-create policy "Profiles are viewable by everyone"
+create policy "Users can view their own profile"
   on public.profiles for select
-  using (true);
+  to authenticated
+  using (auth.uid() = id);
 
 create policy "Users can insert their own profile"
   on public.profiles for insert
@@ -141,23 +143,30 @@ create policy "Users can update their own profile"
   using (auth.uid() = id)
   with check (auth.uid() = id);
 
--- LeetCode stats: anyone can read; only the server-side service role can write
+-- LeetCode stats are owner-readable; only service_role can write.
 alter table public.leetcode_stats enable row level security;
 alter table public.leetcode_fetch_state enable row level security;
 
 drop policy if exists "Stats are viewable by everyone"       on public.leetcode_stats;
 drop policy if exists "Users can insert their own stats"     on public.leetcode_stats;
 drop policy if exists "Users can update their own stats"     on public.leetcode_stats;
+drop policy if exists "Users can view their own stats"       on public.leetcode_stats;
 
-create policy "Stats are viewable by everyone"
+create policy "Users can view their own stats"
   on public.leetcode_stats for select
-  using (true);
+  to authenticated
+  using (auth.uid() = user_id);
 
 revoke all on public.leetcode_fetch_state from public, anon, authenticated;
 grant all on public.leetcode_fetch_state to service_role;
 
--- Only the server-side service role can write refreshed stats.
-revoke insert, update, delete on public.leetcode_stats from public, anon, authenticated;
+revoke all on table public.profiles from public, anon, authenticated;
+grant select, insert, update on table public.profiles to authenticated;
+grant all on table public.profiles to service_role;
+
+revoke all on table public.leetcode_stats from public, anon, authenticated;
+grant select on table public.leetcode_stats to authenticated;
+grant all on table public.leetcode_stats to service_role;
 
 create or replace function public.claim_leetcode_fetch(
   p_username text,

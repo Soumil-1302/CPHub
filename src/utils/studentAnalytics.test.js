@@ -80,17 +80,17 @@ assert.equal(cstOnly[0].rank, 1)
 
 // 7. getStudentByIdentifier
 const sample = [
-  { usn: 'eng25ct0060', username: 'aarav_codes', name: 'Aarav Sharma' },
-  { usn: 'eng24cs0061', username: 'ananya_dev', name: 'Ananya Rao' },
+  { usn: 'test-usn-1', username: 'sample_one', name: 'Student One' },
+  { usn: 'test-usn-2', username: 'sample_two', name: 'Student Two' },
 ]
-assert.equal(getStudentByIdentifier(sample, 'Aarav_Codes')?.name, 'Aarav Sharma')
-assert.equal(getStudentByIdentifier(sample, 'ENG24CS0061')?.name, 'Ananya Rao')
+assert.equal(getStudentByIdentifier(sample, 'Sample_One')?.name, 'Student One')
+assert.equal(getStudentByIdentifier(sample, 'TEST-USN-2')?.name, 'Student Two')
 assert.equal(getStudentByIdentifier(sample, 'unknown'), null)
 
 // 8. computeStudentProfileData
-const profileStudent = { usn: 'eng25ct0060', username: 'aarav_codes', name: 'Aarav Sharma', leetcode: 500, total: 500, branch: 'ct', year: '2025' }
+const profileStudent = { usn: 'test-usn-1', username: 'sample_one', name: 'Student One', leetcode: 500, total: 500, branch: 'ct', year: '2025' }
 const profileData = computeStudentProfileData(profileStudent, [profileStudent, ...unranked], branchMap)
-assert.equal(profileData.student.name, 'Aarav Sharma')
+assert.equal(profileData.student.name, 'Student One')
 assert.equal(profileData.student.totalSolved, 500)
 assert.equal(profileData.lcEasy + profileData.lcMedium + profileData.lcHard, 500)
 assert.ok(profileData.badges.length > 0)

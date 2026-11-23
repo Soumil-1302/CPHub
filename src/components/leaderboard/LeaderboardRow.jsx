@@ -23,9 +23,11 @@ export default function LeaderboardRow({ student, onNavigate }) {
     }
   }
 
-  const handleExternalClick = (e, url) => {
+  const handleExternalClick = (e) => {
     e.stopPropagation()
-    window.open(url, '_blank', 'noopener,noreferrer')
+    if (student.leetcode_username) {
+      window.open(`https://leetcode.com/u/${student.leetcode_username}`, '_blank', 'noopener,noreferrer')
+    }
   }
 
   return (
@@ -71,17 +73,15 @@ export default function LeaderboardRow({ student, onNavigate }) {
       <td className="cell-platform">
         <div
           className="platform-cell-link"
-          title={`View @${username} on LeetCode`}
-          onClick={(e) => handleExternalClick(
-            e,
-            `https://leetcode.com/u/${student.leetcode_username || username}`,
-          )}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && handleExternalClick(
-            e,
-            `https://leetcode.com/u/${student.leetcode_username || username}`,
-          )}
+          title={student.leetcode_username
+            ? `Cached solves — Easy: ${student.easy_solved || 0}, Medium: ${student.medium_solved || 0}, Hard: ${student.hard_solved || 0}. Open @${student.leetcode_username} on LeetCode.`
+            : 'No LeetCode profile linked.'}
+          onClick={student.leetcode_username ? handleExternalClick : undefined}
+          role={student.leetcode_username ? 'button' : undefined}
+          tabIndex={student.leetcode_username ? 0 : undefined}
+          onKeyDown={student.leetcode_username
+            ? (event) => event.key === 'Enter' && handleExternalClick(event)
+            : undefined}
         >
           <img
             src="/lc.jpeg"

@@ -6,7 +6,7 @@
 
 /**
  * Normalizes raw student data whether imported as an Array or an Object keyed by USN.
- * @param {Array|Object} rawData - Raw student data from students.json
+ * @param {Array|Object} rawData - Student records supplied by the caller
  * @returns {Array} List of normalized student objects with guaranteed usn/id fields
  */
 export function normalizeStudentsData(rawData) {
@@ -24,7 +24,7 @@ export function normalizeStudentsData(rawData) {
 
 /**
  * Resolves a student's branch code or name to the human-readable branch name
- * using the mapping provided in branches.json.
+ * using the supplied branch mapping.
  * @param {string} branchVal - Raw branch value from student profile
  * @param {Object} branchMap - Map of branch keys to human-readable names
  * @returns {string} Human-readable branch name
@@ -43,7 +43,7 @@ export function resolveBranchName(branchVal, branchMap = {}) {
 
 /**
  * Extracts a unique list of human-readable branch names.
- * @param {Object} branchesData - Data from branches.json
+ * @param {Object} branchesData - Branch mapping data
  * @returns {Array<string>} Unique branch display names
  */
 export function getBranchList(branchesData) {

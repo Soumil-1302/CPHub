@@ -309,7 +309,7 @@ export default function MyProfile({ navigate }) {
                     type="text"
                     value={form.display_name}
                     onChange={(e) => handleChange('display_name', e.target.value)}
-                    placeholder="Aarav Sharma"
+                    placeholder="Your display name"
                     className="form-input"
                     maxLength={100}
                     disabled={saving}

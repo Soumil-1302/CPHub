@@ -7,6 +7,7 @@ export default function LeaderboardTable({
   currentPage = 1,
   pageSize = 20,
   totalCount = 0,
+  campusStudentCount = 0,
   onPageChange,
   onSortChange,
   onResetFilters,
@@ -25,11 +26,15 @@ export default function LeaderboardTable({
               <line x1="8" y1="11" x2="14" y2="11" />
             </svg>
           </div>
-          <h2 className="empty-state-title">No matching students found</h2>
+          <h2 className="empty-state-title">
+            {campusStudentCount === 0 ? 'No students have completed their profiles yet' : 'No matching students found'}
+          </h2>
           <p className="empty-state-desc">
-            Try adjusting your search query, or clear your department and batch filters to see more results.
+            {campusStudentCount === 0
+              ? 'Leaderboard results will appear here as students join CPHub.'
+              : 'Try adjusting your search query, or clear your department and batch filters to see more results.'}
           </p>
-          {onResetFilters && (
+          {campusStudentCount > 0 && onResetFilters && (
             <button
               type="button"
               className="empty-state-reset-btn"

@@ -10,7 +10,7 @@ create or replace function public.get_public_leaderboard(
 returns jsonb
 language sql
 stable
-security invoker
+security definer
 set search_path = ''
 as $$
   with public_profiles as (

@@ -3,6 +3,7 @@ from typing import Any
 from uuid import UUID
 
 from fastapi import HTTPException, status
+from pydantic import ValidationError
 from supabase import Client
 
 from app.schemas.profile import (
@@ -15,7 +16,7 @@ from app.schemas.profile import (
 
 logger = logging.getLogger("cphub.api.profiles")
 PROFILE_COLUMNS = (
-    "id,username,display_name,branch,graduation_year,leetcode_username,"
+    "id,username,display_name,usn,branch,graduation_year,leetcode_username,"
     "created_at,updated_at"
 )
 
@@ -90,6 +91,7 @@ def _profile_values(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "username": row["username"],
         "display_name": row.get("display_name") or "",
+        "usn": row.get("usn"),
         "branch": row.get("branch") or "",
         "year_of_passing": year_of_passing,
         "leetcode_username": leetcode_username or None,
@@ -241,13 +243,10 @@ def get_public_profile(client: Client, username: str) -> PublicProfileResponse:
         ) from error
 
     try:
-        response = (
-            client.table("profiles")
-            .select(PROFILE_COLUMNS)
-            .eq("username", normalized_username)
-            .maybe_single()
-            .execute()
-        )
+        response = client.rpc(
+            "get_public_profile",
+            {"p_username": normalized_username},
+        ).execute()
     except Exception as error:
         _raise_database_error("get_public", error)
 
@@ -260,4 +259,17 @@ def get_public_profile(client: Client, username: str) -> PublicProfileResponse:
                 "message": "Profile not found.",
             },
         )
-    return PublicProfileResponse(**_profile_values(row))
+    try:
+        return PublicProfileResponse.model_validate(row)
+    except (TypeError, ValidationError) as error:
+        logger.error(
+            "Public profile RPC returned invalid data (%s).",
+            type(error).__name__,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "code": "profile_data_unavailable",
+                "message": "Profile data is temporarily unavailable.",
+            },
+        ) from None

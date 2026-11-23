@@ -1,7 +1,8 @@
 export default function CommunitySnapshot({
-  totalStudents = 100,
-  totalSolved = 43099,
-  branches = ['CST', 'CSE', 'AI&ML', 'CYBER', 'AI&DS', 'DataSci', 'ECE', 'ROBOTICS', 'AEROSPACE', 'MECH'],
+  totalStudents = 0,
+  totalSolved = 0,
+  branches = [],
+  showEmptyState = false,
 }) {
 
   return (
@@ -26,13 +27,13 @@ export default function CommunitySnapshot({
             <div>
               <div className="snapshot-header-row">
                 <span className="snapshot-label">LeetCode Problems Solved</span>
-                <span className="snapshot-badge">Campus Dataset</span>
+                <span className="snapshot-badge">Cached LeetCode Stats</span>
               </div>
               <div className="snapshot-stat-number snapshot-stat-number-lg">
                 {totalSolved.toLocaleString()}
               </div>
               <p className="snapshot-desc">
-                LeetCode problems recorded across university batches.
+                LeetCode problems in successfully refreshed student profiles.
               </p>
             </div>
           </div>
@@ -42,15 +43,15 @@ export default function CommunitySnapshot({
             <div>
               <div className="snapshot-header-row">
                 <span className="snapshot-label">Active Coders</span>
-                <span className="snapshot-badge">4 Batches</span>
+                <span className="snapshot-badge">Completed profiles</span>
               </div>
               <div className="snapshot-stat-number">{totalStudents}</div>
               <p className="snapshot-desc">
-                University students practicing algorithms and climbing the campus LeetCode rankings.
+                Students who have completed their CPHub profiles.
               </p>
             </div>
             <div style={{ fontSize: '13px', color: 'var(--cphub-text-muted)' }}>
-              From 2022 senior cohorts to incoming 2025 freshmen.
+              {totalStudents > 0 ? 'Based on registered CPHub student profiles.' : 'No completed student profiles yet.'}
             </div>
           </div>
 
@@ -59,11 +60,11 @@ export default function CommunitySnapshot({
             <div>
               <div className="snapshot-header-row">
                 <span className="snapshot-label">Departments</span>
-                <span className="section-eyebrow section-eyebrow-dark">Cross-Campus</span>
+                <span className="section-eyebrow section-eyebrow-dark">From Profiles</span>
               </div>
               <div className="snapshot-stat-number">{branches.length}</div>
               <p className="snapshot-desc">
-                Engineering departments represented with branch-wise standings and friendly rivalry.
+                Departments represented by students with completed profiles.
               </p>
             </div>
             <div className="snapshot-branch-pills">
@@ -72,33 +73,22 @@ export default function CommunitySnapshot({
                   {branch}
                 </span>
               ))}
-              <span className="branch-mini-pill" style={{ background: 'rgba(255,255,255,0.08)', color: '#e4e4e7' }}>
-                +{branches.length - 6} more
-              </span>
+              {branches.length > 6 && (
+                <span className="branch-mini-pill" style={{ background: 'rgba(255,255,255,0.08)', color: '#e4e4e7' }}>
+                  +{branches.length - 6} more
+                </span>
+              )}
             </div>
           </div>
 
-          {/* Card 4: Top Leading Batch */}
-          <div className="snapshot-card" style={{ gridColumn: '2 / 4' }}>
-            <div className="snapshot-header-row">
-              <span className="snapshot-label">Competitive Milestone</span>
-              <span className="snapshot-badge">Top Batch: 2024–2028</span>
+          {showEmptyState && (
+            <div className="snapshot-card" role="status" style={{ gridColumn: '1 / -1' }}>
+              <strong>No students have completed their profiles yet.</strong>
+              <p className="snapshot-desc">
+                Campus statistics and leaderboard results will appear here as students join CPHub.
+              </p>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
-              <div>
-                <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--cphub-text-main)', marginBottom: '6px' }}>
-                  High-Velocity Growth
-                </div>
-                <p className="snapshot-desc" style={{ marginBottom: 0, maxWidth: '440px' }}>
-                  Sophomore and junior batches lead current daily submission volume, averaging over 450+ problems solved per student.
-                </p>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <span style={{ fontSize: '36px', fontWeight: '800', color: 'var(--cphub-accent)' }}>#1 CST</span>
-                <div style={{ fontSize: '12px', color: 'var(--cphub-text-muted)' }}>Department Leaderboard Position</div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </section>

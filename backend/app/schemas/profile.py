@@ -183,10 +183,18 @@ class PublicProfileResponse(BaseModel):
 
     username: str
     display_name: str
+    usn: str | None = None
     branch: str
     year_of_passing: int
     leetcode_username: str | None
     leetcode_profile_url: str | None
+    solved_total: int = Field(default=0, ge=0)
+    easy_solved: int = Field(default=0, ge=0)
+    medium_solved: int = Field(default=0, ge=0)
+    hard_solved: int = Field(default=0, ge=0)
+    contest_rating: float | None = Field(default=None, ge=0)
+    global_ranking: int | None = Field(default=None, ge=0)
+    fetched_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 

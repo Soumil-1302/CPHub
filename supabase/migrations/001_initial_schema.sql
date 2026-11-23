@@ -170,46 +170,8 @@ create trigger on_auth_user_created
 -- 5. ROW LEVEL SECURITY (RLS)
 -- ────────────────────────────────────────
 --
--- ┌─────────────────────────────────────────────────────────────────┐
--- │                    VISIBILITY DECISION                         │
--- │                                                                │
--- │  Question: Should profile data and leaderboard stats be        │
--- │  readable by any visitor (including unauthenticated ones),     │
--- │  or only by signed-in users?                                   │
--- │                                                                │
--- │  CHOSEN: Public read (`using (true)`).                         │
--- │                                                                │
--- │  Reasoning:                                                    │
--- │                                                                │
--- │  1. CPHub is a university leaderboard. Its core value is       │
--- │     showing rankings to the community. Requiring login just    │
--- │     to view the board would add friction and reduce the        │
--- │     motivational visibility that drives participation.         │
--- │                                                                │
--- │  2. The only data stored in these tables is what a student     │
--- │     voluntarily provides: display name, branch, grad year,     │
--- │     LeetCode handle, and publicly available LeetCode stats.    │
--- │     None of this is sensitive — LeetCode profiles are already  │
--- │     public on leetcode.com.                                    │
--- │                                                                │
--- │  3. Supabase's anon key (used by the frontend) has limited     │
--- │     power: it can only do what the RLS policies allow.         │
--- │     Even with public SELECT, writes are still restricted to    │
--- │     the row owner via auth.uid() checks below.                 │
--- │                                                                │
--- │  Trade-off:                                                    │
--- │     Anyone with the anon key (visible in the JS bundle) can    │
--- │     enumerate all profiles via the PostgREST API. For a        │
--- │     university leaderboard this is acceptable. If the app      │
--- │     later stores private data (emails, phone numbers, etc.),   │
--- │     you should create a SEPARATE table for private fields      │
--- │     with a stricter policy: `using (auth.uid() = id)`.        │
--- │                                                                │
--- │  ALTERNATIVE (signed-in only):                                 │
--- │     Replace  `using (true)`                                    │
--- │     with     `using (auth.role() = 'authenticated')`           │
--- │     on both SELECT policies below.                             │
--- └─────────────────────────────────────────────────────────────────┘
+-- Public profile and leaderboard reads are provided by explicitly
+-- projected API functions. The base tables remain owner-restricted.
 
 -- Enable RLS (required before any policy takes effect).
 alter table public.profiles       enable row level security;
@@ -222,11 +184,12 @@ alter table public.leetcode_stats enable row level security;
 drop policy if exists "Profiles are viewable by everyone"  on public.profiles;
 drop policy if exists "Users can insert their own profile" on public.profiles;
 drop policy if exists "Users can update their own profile" on public.profiles;
+drop policy if exists "Users can view their own profile" on public.profiles;
 
--- SELECT: anyone can read (see decision above).
-create policy "Profiles are viewable by everyone"
+create policy "Users can view their own profile"
   on public.profiles for select
-  using (true);
+  to authenticated
+  using (auth.uid() = id);
 
 -- INSERT: only the owner may create their row.
 -- In practice the signup trigger handles this, but the policy
@@ -252,22 +215,20 @@ create policy "Users can update their own profile"
 drop policy if exists "Stats are viewable by everyone"   on public.leetcode_stats;
 drop policy if exists "Users can insert their own stats" on public.leetcode_stats;
 drop policy if exists "Users can update their own stats" on public.leetcode_stats;
+drop policy if exists "Users can view their own stats"   on public.leetcode_stats;
 
--- SELECT: anyone can read (leaderboard data).
-create policy "Stats are viewable by everyone"
+create policy "Users can view their own stats"
   on public.leetcode_stats for select
-  using (true);
+  to authenticated
+  using (auth.uid() = user_id);
 
--- INSERT: owner only.
-create policy "Users can insert their own stats"
-  on public.leetcode_stats for insert
-  with check (auth.uid() = user_id);
+revoke all on table public.profiles from public, anon, authenticated;
+grant select, insert, update on table public.profiles to authenticated;
+grant all on table public.profiles to service_role;
 
--- UPDATE: owner only.
-create policy "Users can update their own stats"
-  on public.leetcode_stats for update
-  using      (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+revoke all on table public.leetcode_stats from public, anon, authenticated;
+grant select on table public.leetcode_stats to authenticated;
+grant all on table public.leetcode_stats to service_role;
 
 
 -- ============================================================

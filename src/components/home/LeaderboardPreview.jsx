@@ -1,30 +1,50 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { ROUTES } from '../../constants/routes'
+import { getLeaderboard } from '../../services/leaderboardApi'
+import { getApiErrorMessage } from '../../services/api'
 
-export default function LeaderboardPreview({ students = [], onNavigate }) {
+export default function LeaderboardPreview({ onNavigate }) {
   const [selectedBranch, setSelectedBranch] = useState('ALL')
+  const [result, setResult] = useState(null)
+  const loading = result?.branch !== selectedBranch
+  const students = loading ? [] : result.students
+  const error = loading ? '' : result.error
+  const filterTabs = ['ALL', ...(result?.branches || [])]
 
-  // Top branch options for quick preview tabs
-  const filterTabs = ['ALL', 'CST', 'CSE', 'AI&ML', 'CYBER', 'AI&DS']
-
-  // Filter and sort students descending by LeetCode solve count
-  const filteredPreview = useMemo(() => {
-    let list = students
-    if (selectedBranch !== 'ALL') {
-      list = list.filter((s) => (s.branch || '').toUpperCase() === selectedBranch)
-    }
-
-    // Sort descending by LeetCode solve count
-    const sorted = [...list].sort((a, b) => {
-      return (Number(b.leetcode) || 0) - (Number(a.leetcode) || 0)
+  useEffect(() => {
+    let active = true
+    getLeaderboard({
+      limit: 6,
+      branch: selectedBranch,
+      sortBy: 'total_solved',
+      sortOrder: 'desc',
     })
-
-    // Take top 6 for the preview
-    return sorted.slice(0, 6).map((student, idx) => ({
-      ...student,
-      rank: idx + 1,
-    }))
-  }, [students, selectedBranch])
+      .then((data) => {
+        if (active) {
+          setResult({
+            branch: selectedBranch,
+            students: data.students || [],
+            branches: data.summary?.available_branches || [],
+            totalStudents: data.summary?.total_students || 0,
+            error: '',
+          })
+        }
+      })
+      .catch((requestError) => {
+        if (active) {
+          setResult({
+            branch: selectedBranch,
+            students: [],
+            branches: [],
+            totalStudents: 0,
+            error: getApiErrorMessage(requestError, 'Unable to load the leaderboard preview.'),
+          })
+        }
+      })
+    return () => {
+      active = false
+    }
+  }, [selectedBranch])
 
   return (
     <section className="cphub-preview-section" aria-label="Leaderboard Preview">
@@ -61,7 +81,7 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
             </div>
 
             <div style={{ fontSize: '13px', color: 'var(--cphub-text-muted)' }}>
-              Showing top {filteredPreview.length} performers
+              {loading ? 'Loading performers…' : `Showing top ${students.length} performers`}
             </div>
           </div>
 
@@ -78,7 +98,7 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
                 </tr>
               </thead>
               <tbody>
-                {filteredPreview.map((student) => (
+                {students.map((student) => (
                   <tr
                     key={student.username || student.rank}
                     style={{ cursor: 'pointer' }}
@@ -123,6 +143,17 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
                     </td>
                   </tr>
                 ))}
+                {!loading && !error && students.length === 0 && (
+                  <tr>
+                    <td colSpan="5">
+                      {result.totalStudents
+                        ? 'No students found for this branch.'
+                        : 'No students have completed their profiles yet.'}
+                    </td>
+                  </tr>
+                )}
+                {error && <tr><td colSpan="5" role="alert">{error}</td></tr>}
+                {loading && <tr><td colSpan="5" role="status">Loading leaderboard…</td></tr>}
               </tbody>
             </table>
           </div>
@@ -136,7 +167,7 @@ export default function LeaderboardPreview({ students = [], onNavigate }) {
               className="btn-preview-cta"
               onClick={() => onNavigate && onNavigate(ROUTES.LEADERBOARD)}
             >
-              <span>View Full 100+ Leaderboard</span>
+              <span>View Full Leaderboard</span>
               <span aria-hidden="true">→</span>
             </button>
           </div>
