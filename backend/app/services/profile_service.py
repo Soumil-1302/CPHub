@@ -1,0 +1,263 @@
+import logging
+from typing import Any
+from uuid import UUID
+
+from fastapi import HTTPException, status
+from supabase import Client
+
+from app.schemas.profile import (
+    MyProfileResponse,
+    ProfileCreateRequest,
+    ProfileUpdateRequest,
+    PublicProfileResponse,
+    normalize_profile_username,
+)
+
+logger = logging.getLogger("cphub.api.profiles")
+PROFILE_COLUMNS = (
+    "id,username,display_name,branch,graduation_year,leetcode_username,"
+    "created_at,updated_at"
+)
+
+
+def _database_error_code(error: Exception) -> str | None:
+    code = getattr(error, "code", None)
+    if isinstance(code, str):
+        return code
+    if isinstance(error, dict):
+        value = error.get("code")
+        return value if isinstance(value, str) else None
+    return None
+
+
+def _raise_database_error(operation: str, error: Exception) -> None:
+    code = _database_error_code(error)
+    logger.error("Profile database operation failed (%s, code=%s).", operation, code or "unknown")
+
+    if code == "23505":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "code": "username_taken",
+                "message": "That username is already in use.",
+            },
+        ) from None
+    if code == "P0001":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "code": "profile_exists",
+                "message": "A profile with a username already exists for this account.",
+            },
+        ) from None
+    if code == "PGRST116":
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "code": "profile_not_found",
+                "message": "Profile not found.",
+            },
+        ) from None
+
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail={
+            "code": "profile_operation_failed",
+            "message": "The profile could not be processed.",
+        },
+    ) from None
+
+
+def _as_profile_row(data: Any) -> dict[str, Any] | None:
+    if isinstance(data, list):
+        data = data[0] if data else None
+    return data if isinstance(data, dict) else None
+
+
+def _profile_values(row: dict[str, Any]) -> dict[str, Any]:
+    leetcode_username = row.get("leetcode_username") or ""
+    try:
+        year_of_passing = int(row["graduation_year"])
+    except (KeyError, TypeError, ValueError) as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "code": "invalid_profile_data",
+                "message": "The saved profile data could not be processed.",
+            },
+        ) from error
+
+    return {
+        "username": row["username"],
+        "display_name": row.get("display_name") or "",
+        "branch": row.get("branch") or "",
+        "year_of_passing": year_of_passing,
+        "leetcode_username": leetcode_username or None,
+        "leetcode_profile_url": (
+            f"https://leetcode.com/u/{leetcode_username}/" if leetcode_username else None
+        ),
+        "created_at": row["created_at"],
+        "updated_at": row["updated_at"],
+    }
+
+
+def _get_profile_by_id(client: Client, user_id: UUID) -> dict[str, Any] | None:
+    try:
+        response = (
+            client.table("profiles")
+            .select(PROFILE_COLUMNS)
+            .eq("id", str(user_id))
+            .maybe_single()
+            .execute()
+        )
+    except Exception as error:
+        _raise_database_error("get_by_id", error)
+    return _as_profile_row(response.data)
+
+
+def get_my_profile(
+    client: Client,
+    user_id: UUID,
+    email: str | None,
+) -> MyProfileResponse:
+    row = _get_profile_by_id(client, user_id)
+    if not row or not row.get("username"):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "code": "profile_not_found",
+                "message": "You have not created a profile yet.",
+            },
+        )
+    return MyProfileResponse(
+        **_profile_values(row),
+        user_id=user_id,
+        university_email=email,
+    )
+
+
+def create_profile(
+    client: Client,
+    user_id: UUID,
+    email: str | None,
+    request: ProfileCreateRequest,
+) -> MyProfileResponse:
+    try:
+        response = client.rpc(
+            "create_or_complete_profile",
+            {
+                "p_user_id": str(user_id),
+                "p_username": request.username,
+                "p_display_name": request.display_name,
+                "p_branch": request.branch,
+                "p_graduation_year": str(request.year_of_passing),
+                "p_leetcode_username": request.leetcode_username,
+            },
+        ).execute()
+    except Exception as error:
+        _raise_database_error("create", error)
+
+    row = _as_profile_row(response.data)
+    if not row:
+        logger.error("Profile creation RPC returned no profile row.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "code": "profile_creation_failed",
+                "message": "The profile could not be created.",
+            },
+        )
+    return MyProfileResponse(
+        **_profile_values(row),
+        user_id=user_id,
+        university_email=email,
+    )
+
+
+def update_my_profile(
+    client: Client,
+    user_id: UUID,
+    email: str | None,
+    request: ProfileUpdateRequest,
+) -> MyProfileResponse:
+    try:
+        updates = request.database_updates()
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "code": "invalid_profile_update",
+                "message": str(error),
+            },
+        ) from error
+
+    if not updates:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "code": "empty_profile_update",
+                "message": "Provide at least one profile field to update.",
+            },
+        )
+
+    try:
+        response = (
+            client.table("profiles")
+            .update(updates)
+            .eq("id", str(user_id))
+            .select(PROFILE_COLUMNS)
+            .maybe_single()
+            .execute()
+        )
+    except Exception as error:
+        _raise_database_error("update", error)
+
+    row = _as_profile_row(response.data)
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "code": "profile_not_found",
+                "message": "You have not created a profile yet.",
+            },
+        )
+    return MyProfileResponse(
+        **_profile_values(row),
+        user_id=user_id,
+        university_email=email,
+    )
+
+
+def get_public_profile(client: Client, username: str) -> PublicProfileResponse:
+    try:
+        normalized_username = normalize_profile_username(username)
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "code": "invalid_username",
+                "message": str(error),
+            },
+        ) from error
+
+    try:
+        response = (
+            client.table("profiles")
+            .select(PROFILE_COLUMNS)
+            .eq("username", normalized_username)
+            .maybe_single()
+            .execute()
+        )
+    except Exception as error:
+        _raise_database_error("get_public", error)
+
+    row = _as_profile_row(response.data)
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "code": "profile_not_found",
+                "message": "Profile not found.",
+            },
+        )
+    return PublicProfileResponse(**_profile_values(row))
