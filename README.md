@@ -145,8 +145,7 @@ and protected endpoints require the backend environment and database setup.
 3. If using a custom SMTP provider such as Brevo, configure its verified
    sender and SMTP credentials in the Supabase Dashboard. SMTP credentials
    belong in Supabase settings, not this repository or React.
-4. CPHub accepts verified student addresses ending in `@dsu.cp.in` or
-   `@dsu.edu.in`.
+4. CPHub accepts verified student addresses ending only in `@dsu.edu.in`.
 5. Preserve RLS. Do not disable RLS or add public table-wide read policies to
    make the API work. The public data functions are the intended projection
    boundary.

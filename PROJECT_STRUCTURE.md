@@ -45,8 +45,8 @@ This document provides a comprehensive overview of the design patterns, architec
   observes auth-state changes (including `PASSWORD_RECOVERY`), and exposes
   sign-out.
 - **Rate-limit helpers and tests:** `src/constants/auth.js` centralizes the
-  six-digit OTP length, 60-second cooldown, and allowed `dsu.cp.in` and
-  `dsu.edu.in` domains.
+  six-digit OTP length, 60-second cooldown, and the allowed `dsu.edu.in`
+  domain.
   `src/utils/otpRequestControls.js` implements per-email cooldown and request
   locking. `src/services/authService.test.js` mocks Supabase Auth, so tests do
   not send real email.
@@ -72,7 +72,7 @@ This document provides a comprehensive overview of the design patterns, architec
   safeguard; it does not raise or bypass Supabase Auth server-side rate limits
   or Brevo account quotas. Review limits and current sending quotas in their
   respective dashboards. Verify the Brevo sending domain and DNS records.
-  CPHub validation permits `@dsu.cp.in` and `@dsu.edu.in`.
+  CPHub validation permits only `@dsu.edu.in`.
 - **Redirects and testing:** allowlist the production and local
   `/login?mode=recovery` redirect URLs in Supabase Authentication URL
   Configuration. Run `npm test` from `Frontend/`; tests use mocked Supabase
