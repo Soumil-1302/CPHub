@@ -1,33 +1,20 @@
-import { useState, useMemo } from 'react'
 import LeaderboardRow from './LeaderboardRow'
 
 export default function LeaderboardTable({
   students = [],
-  sortBy = 'leetcode',
+  sortBy = 'total_solved',
   sortOrder = 'desc',
+  currentPage = 1,
+  pageSize = 20,
+  totalCount = 0,
+  onPageChange,
   onSortChange,
   onResetFilters,
   onNavigate,
 }) {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [prevFilterKey, setPrevFilterKey] = useState(`${students.length}-${sortBy}-${sortOrder}`)
-  const currentFilterKey = `${students.length}-${sortBy}-${sortOrder}`
+  const totalPages = Math.ceil(totalCount / pageSize) || 1
 
-  // Adjust page to 1 during render whenever student list length or sort changes
-  if (prevFilterKey !== currentFilterKey) {
-    setPrevFilterKey(currentFilterKey)
-    setCurrentPage(1)
-  }
-
-  const pageSize = 20
-
-  const totalPages = Math.ceil(students.length / pageSize) || 1
-  const paginatedStudents = useMemo(() => {
-    const start = (currentPage - 1) * pageSize
-    return students.slice(start, start + pageSize)
-  }, [students, currentPage])
-
-  if (students.length === 0) {
+  if (totalCount === 0) {
     return (
       <div className="leaderboard-table-card">
         <div className="leaderboard-empty-state" role="status">
@@ -57,7 +44,10 @@ export default function LeaderboardTable({
   }
 
   const renderSortIndicator = (columnKey) => {
-    if (sortBy !== columnKey) return null
+    const activeSort = columnKey === 'rank' || columnKey === 'leetcode'
+      ? 'total_solved'
+      : columnKey
+    if (sortBy !== activeSort) return null
     return (
       <span className="sort-arrow-indicator" aria-hidden="true">
         {sortOrder === 'desc' ? ' ↓' : ' ↑'}
@@ -72,7 +62,7 @@ export default function LeaderboardTable({
   }
 
   const startEntry = (currentPage - 1) * pageSize + 1
-  const endEntry = Math.min(currentPage * pageSize, students.length)
+  const endEntry = Math.min((currentPage - 1) * pageSize + students.length, totalCount)
 
   return (
     <div className="leaderboard-table-card">
@@ -116,7 +106,7 @@ export default function LeaderboardTable({
             </tr>
           </thead>
           <tbody>
-            {paginatedStudents.map((student) => (
+            {students.map((student) => (
               <LeaderboardRow
                 key={student.username || student.rank || student.usn}
                 student={student}
@@ -130,7 +120,7 @@ export default function LeaderboardTable({
       {/* Pagination Footer */}
       <footer className="table-pagination-footer" aria-label="Leaderboard Pagination">
         <div className="pagination-info">
-          Showing <strong>{startEntry}–{endEntry}</strong> of {students.length} students
+          Showing <strong>{startEntry}–{endEntry}</strong> of {totalCount} students
         </div>
 
         {totalPages > 1 && (
@@ -139,7 +129,7 @@ export default function LeaderboardTable({
               type="button"
               className="pagination-btn"
               disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              onClick={() => onPageChange?.((page) => Math.max(1, page - 1))}
               aria-label="Previous page"
             >
               ← Prev
@@ -151,7 +141,7 @@ export default function LeaderboardTable({
                   key={pageNum}
                   type="button"
                   className={`pagination-page-btn ${pageNum === currentPage ? 'active' : ''}`}
-                  onClick={() => setCurrentPage(pageNum)}
+                  onClick={() => onPageChange?.(pageNum)}
                   aria-label={`Go to page ${pageNum}`}
                   aria-current={pageNum === currentPage ? 'page' : undefined}
                 >
@@ -164,7 +154,7 @@ export default function LeaderboardTable({
               type="button"
               className="pagination-btn"
               disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              onClick={() => onPageChange?.((page) => Math.min(totalPages, page + 1))}
               aria-label="Next page"
             >
               Next →

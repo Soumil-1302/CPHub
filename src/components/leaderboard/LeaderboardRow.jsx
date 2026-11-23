@@ -72,10 +72,16 @@ export default function LeaderboardRow({ student, onNavigate }) {
         <div
           className="platform-cell-link"
           title={`View @${username} on LeetCode`}
-          onClick={(e) => handleExternalClick(e, `https://leetcode.com/u/${username}`)}
+          onClick={(e) => handleExternalClick(
+            e,
+            `https://leetcode.com/u/${student.leetcode_username || username}`,
+          )}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && handleExternalClick(e, `https://leetcode.com/u/${username}`)}
+          onKeyDown={(e) => e.key === 'Enter' && handleExternalClick(
+            e,
+            `https://leetcode.com/u/${student.leetcode_username || username}`,
+          )}
         >
           <img
             src="/lc.jpeg"

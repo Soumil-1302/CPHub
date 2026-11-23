@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "node src/utils/studentAnalytics.test.js && node supabase/functions/_shared/leetcodeProvider.test.js",
+    "test": "node src/utils/studentAnalytics.test.js && node supabase/functions/_shared/leetcodeProvider.test.js && node --test src/services/authService.test.js",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -95,42 +95,56 @@ export async function updateMyProfile(updates) {
 }
 
 /**
- * Fetches all profiles, ordered by total solved (via a joined stats query).
- * Used for the leaderboard.
- * @param {Object} options - { limit?, offset?, branch?, graduation_year? }
+ * Fetches a public, paginated leaderboard from the FastAPI backend.
  */
 export async function getLeaderboard({
-  limit = 100,
+  limit = 20,
   offset = 0,
   branch,
   graduationYear,
+  sortBy = 'total_solved',
+  sortOrder = 'desc',
+  search,
 } = {}) {
-  let query = supabase
-    .from('profiles')
-    .select(`
-      *,
-      leetcode_stats (
-        solved_total,
-        easy_solved,
-        medium_solved,
-        hard_solved,
-        fetched_at,
-        fetch_status
-      )
-    `)
-    .order('created_at', { ascending: true })
-    .range(offset, offset + limit - 1)
-
-  if (branch) {
-    query = query.eq('branch', branch)
-  }
-  if (graduationYear) {
-    query = query.eq('graduation_year', graduationYear)
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+  if (!apiBaseUrl) {
+    return { data: null, error: { message: 'The CPHub API is not configured.' } }
   }
 
-  const { data, error } = await query
+  const params = new URLSearchParams({
+    limit: String(limit),
+    offset: String(offset),
+    sort_by: sortBy,
+    sort_order: sortOrder,
+  })
+  if (branch && branch !== 'ALL') params.set('branch', branch)
+  if (graduationYear && graduationYear !== 'ALL') params.set('year', graduationYear)
+  if (search?.trim()) params.set('search', search.trim())
 
-  return { data, error }
+  let response
+  try {
+    response = await fetch(
+      `${apiBaseUrl.replace(/\/+$/, '')}/api/leaderboard?${params.toString()}`,
+      { headers: { Accept: 'application/json' } },
+    )
+  } catch {
+    return { data: null, error: { message: 'Unable to connect to the CPHub API.' } }
+  }
+
+  let payload
+  try {
+    payload = await response.json()
+  } catch {
+    return { data: null, error: { message: 'The CPHub API returned an invalid response.' } }
+  }
+  if (!response.ok || payload?.success !== true) {
+    return {
+      data: null,
+      error: { message: payload?.error?.message || 'Unable to load the leaderboard.' },
+    }
+  }
+
+  return { data: payload.data, error: null }
 }
 
 // ═══════════════════════════════════════════
@@ -155,8 +169,52 @@ export async function getLeetcodeStats(userId) {
  * The browser sends no LeetCode request or credentials.
  */
 export async function refreshMyLeetcodeStats() {
-  const { data, error } = await supabase.functions.invoke('leetcode-refresh', {
-    body: {},
-  })
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+  if (sessionError) return { data: null, error: sessionError }
+  if (!session?.access_token) {
+    return { data: null, error: { message: 'Sign in before refreshing LeetCode stats.' } }
+  }
+
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+  if (!apiBaseUrl) {
+    return { data: null, error: { message: 'The CPHub API is not configured.' } }
+  }
+
+  let response
+  try {
+    response = await fetch(`${apiBaseUrl.replace(/\/+$/, '')}/api/leetcode/refresh`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        Accept: 'application/json',
+      },
+    })
+  } catch {
+    return {
+      data: null,
+      error: { message: 'Unable to connect to the CPHub API. Please try again later.' },
+    }
+  }
+
+  let payload
+  try {
+    payload = await response.json()
+  } catch {
+    return {
+      data: null,
+      error: { message: 'The CPHub API returned an invalid response.' },
+    }
+  }
+
+  const data = {
+    stats: payload?.data || null,
+    cached: payload?.cached === true,
+    fetch_status: payload?.success ? 'success' : 'error',
+    retry_after_seconds: payload?.error?.retry_after_seconds,
+  }
+  const error = response.ok
+    ? null
+    : { message: payload?.error?.message || 'Could not refresh LeetCode stats.' }
+
   return { data, error }
 }

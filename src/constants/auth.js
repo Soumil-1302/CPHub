@@ -2,11 +2,17 @@
  * Authentication Configuration
  *
  * Single source of truth for auth-related settings.
- * To allow a different university, change ALLOWED_EMAIL_DOMAIN here only.
+ * Keep the accepted student email suffixes centralized here.
  */
 
-/** Only emails ending with exactly "@<this domain>" may sign in. */
-export const ALLOWED_EMAIL_DOMAIN = 'dsu.edu.in'
+/** Exact university email domains accepted for authentication. */
+export const ALLOWED_EMAIL_DOMAINS = Object.freeze(['dsu.edu.in'])
 
-/** How many digits the OTP code has (matches Supabase default). */
-export const OTP_CODE_LENGTH = 6
+/** How many digits Supabase email OTP codes have. */
+export const OTP_LENGTH = 6
+
+/** Client-side minimum delay between OTP sends to the same email address. */
+export const OTP_RESEND_COOLDOWN_SECONDS = 60
+
+/** @deprecated Use OTP_LENGTH. Kept for existing imports. */
+export const OTP_CODE_LENGTH = OTP_LENGTH

@@ -1,5 +1,4 @@
-import { useState, useMemo } from 'react'
-import studentsData from '../data/students.json'
+import { useEffect, useMemo, useState } from 'react'
 import branchesData from '../data/branches.json'
 import FloatingNavbar from '../components/layout/FloatingNavbar'
 import LeaderboardHeader from '../components/leaderboard/LeaderboardHeader'
@@ -7,85 +6,117 @@ import LeaderboardPodium from '../components/leaderboard/LeaderboardPodium'
 import LeaderboardFilters from '../components/leaderboard/LeaderboardFilters'
 import LeaderboardTable from '../components/leaderboard/LeaderboardTable'
 import ClosingCTA from '../components/layout/ClosingCTA'
-import {
-  normalizeStudentsData,
-  getBranchList,
-  getYearOptions,
-  calculateCampusStats,
-  processLeaderboardStudents,
-} from '../utils/studentAnalytics'
+import { getLeaderboard } from '../services/databaseService'
 import '../styles/leaderboard.css'
 
+const PAGE_SIZE = 20
+
 export default function Leaderboard({ navigate }) {
-  // Filter and Sorting States
   const [selectedBranch, setSelectedBranch] = useState('ALL')
   const [selectedYear, setSelectedYear] = useState('ALL')
   const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState('leetcode')
+  const [sortBy, setSortBy] = useState('total_solved')
   const [sortOrder, setSortOrder] = useState('desc')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [leaderboardData, setLeaderboardData] = useState(null)
+  const [topStudents, setTopStudents] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
 
-  // 1. Process branches map from branches.json
-  const branchMap = useMemo(() => {
-    if (!branchesData) return {}
-    return branchesData.branch || branchesData
+  const branchOptions = useMemo(
+    () => [...new Set(Object.values(branchesData.branch || {}))],
+    [],
+  )
+  const students = leaderboardData?.students || []
+  const summary = leaderboardData?.summary
+  const pagination = leaderboardData?.pagination
+  const yearOptions = summary?.available_years || []
+
+  useEffect(() => {
+    let active = true
+    getLeaderboard({
+      limit: PAGE_SIZE,
+      offset: (currentPage - 1) * PAGE_SIZE,
+      branch: selectedBranch,
+      graduationYear: selectedYear,
+      sortBy,
+      sortOrder,
+      search: searchQuery,
+    }).then(({ data, error }) => {
+      if (!active) return
+      if (error) {
+        setLoadError(error.message)
+        setLeaderboardData(null)
+      } else {
+        setLoadError('')
+        setLeaderboardData(data)
+      }
+      setLoading(false)
+    })
+
+    return () => {
+      active = false
+    }
+  }, [currentPage, selectedBranch, selectedYear, sortBy, sortOrder, searchQuery])
+
+  useEffect(() => {
+    let active = true
+    getLeaderboard({ limit: 3, sortBy: 'total_solved', sortOrder: 'desc' })
+      .then(({ data }) => {
+        if (active && data) setTopStudents(data.students)
+      })
+
+    return () => {
+      active = false
+    }
   }, [])
 
-  // 2. Extract unique branch options for filtering
-  const branchOptions = useMemo(() => {
-    return getBranchList(branchesData)
-  }, [])
+  const handleBranchChange = (value) => {
+    setSelectedBranch(value)
+    setCurrentPage(1)
+  }
 
-  // 3. Normalize students data whether imported as an array or object keyed by USN
-  const studentsList = useMemo(() => {
-    return normalizeStudentsData(studentsData)
-  }, [])
+  const handleYearChange = (value) => {
+    setSelectedYear(value)
+    setCurrentPage(1)
+  }
 
-  // 4. Extract unique graduation batches/years
-  const yearOptions = useMemo(() => {
-    return getYearOptions(studentsList)
-  }, [studentsList])
+  const handleSearchChange = (value) => {
+    setSearchQuery(value)
+    setCurrentPage(1)
+  }
 
-  // 5. Overall campus metrics for the header
-  const overallMetrics = useMemo(() => {
-    return calculateCampusStats(studentsList, branchMap)
-  }, [studentsList, branchMap])
+  const handleSortByChange = (value) => {
+    setSortBy(value)
+    setSortOrder('desc')
+    setCurrentPage(1)
+  }
 
-  // 6. Natural top 3 students overall (unfiltered) for the podium
-  const topStudents = useMemo(() => {
-    const allRanked = processLeaderboardStudents(studentsList, {}, branchMap)
-    return allRanked.slice(0, 3)
-  }, [studentsList, branchMap])
-
-  // 7. Filter, sort, and rank students according to active criteria
-  const processedStudents = useMemo(() => {
-    return processLeaderboardStudents(
-      studentsList,
-      { selectedBranch, selectedYear, searchQuery, sortBy, sortOrder },
-      branchMap
-    )
-  }, [studentsList, selectedBranch, selectedYear, searchQuery, sortBy, sortOrder, branchMap])
-
-  // Sorting handlers
   const handleSortChange = (columnKey) => {
-    if (sortBy === columnKey) {
-      setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))
+    const nextSortBy = columnKey === 'rank' || columnKey === 'leetcode'
+      ? 'total_solved'
+      : columnKey
+    if (sortBy === nextSortBy) {
+      setSortOrder((previous) => previous === 'desc' ? 'asc' : 'desc')
     } else {
-      setSortBy(columnKey)
+      setSortBy(nextSortBy)
       setSortOrder('desc')
     }
+    setCurrentPage(1)
   }
 
   const handleToggleSortOrder = () => {
-    setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))
+    setSortOrder((previous) => previous === 'desc' ? 'asc' : 'desc')
+    setCurrentPage(1)
   }
 
-  // Reset filters handler
   const handleResetFilters = () => {
     setSelectedBranch('ALL')
     setSelectedYear('ALL')
     setSearchQuery('')
-    setSortBy('leetcode')
+    setSortBy('total_solved')
     setSortOrder('desc')
+    setCurrentPage(1)
   }
 
   return (
@@ -95,18 +126,13 @@ export default function Leaderboard({ navigate }) {
       <main className="leaderboard-main">
         <div className="cphub-container">
           <LeaderboardHeader
-            totalStudents={overallMetrics.totalStudents}
-            totalSolved={overallMetrics.totalSolved}
-            activeBranchCount={overallMetrics.activeBranchCount}
+            totalStudents={summary?.total_students || 0}
+            totalSolved={summary?.total_solved || 0}
+            activeBranchCount={summary?.active_branch_count || 0}
           />
 
-          {/* Podium section for Top 3 performers */}
-          <LeaderboardPodium
-            topStudents={topStudents}
-            onNavigate={navigate}
-          />
+          <LeaderboardPodium topStudents={topStudents} onNavigate={navigate} />
 
-          {/* Search, Department, Batch, and Sorting Filters */}
           <LeaderboardFilters
             branchOptions={branchOptions}
             yearOptions={yearOptions}
@@ -115,25 +141,32 @@ export default function Leaderboard({ navigate }) {
             searchQuery={searchQuery}
             sortBy={sortBy}
             sortOrder={sortOrder}
-            onBranchChange={setSelectedBranch}
-            onYearChange={setSelectedYear}
-            onSearchChange={setSearchQuery}
-            onSortByChange={setSortBy}
+            onBranchChange={handleBranchChange}
+            onYearChange={handleYearChange}
+            onSearchChange={handleSearchChange}
+            onSortByChange={handleSortByChange}
             onToggleSortOrder={handleToggleSortOrder}
             onResetFilters={handleResetFilters}
-            resultCount={processedStudents.length}
-            totalCount={studentsList.length}
+            resultCount={pagination?.total || 0}
+            totalCount={summary?.total_students || 0}
           />
 
-          {/* Dynamic Leaderboard Table with Pagination */}
-          <LeaderboardTable
-            students={processedStudents}
-            sortBy={sortBy}
-            sortOrder={sortOrder}
-            onSortChange={handleSortChange}
-            onResetFilters={handleResetFilters}
-            onNavigate={navigate}
-          />
+          {loading && <p role="status">Loading leaderboard…</p>}
+          {loadError && <p role="alert">{loadError}</p>}
+          {!loading && !loadError && (
+            <LeaderboardTable
+              students={students}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              currentPage={currentPage}
+              pageSize={PAGE_SIZE}
+              totalCount={pagination?.total || 0}
+              onPageChange={setCurrentPage}
+              onSortChange={handleSortChange}
+              onResetFilters={handleResetFilters}
+              onNavigate={navigate}
+            />
+          )}
         </div>
       </main>
 

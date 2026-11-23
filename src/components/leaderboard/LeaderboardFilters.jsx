@@ -4,7 +4,7 @@ export default function LeaderboardFilters({
   selectedBranch = 'ALL',
   selectedYear = 'ALL',
   searchQuery = '',
-  sortBy = 'leetcode',
+  sortBy = 'total_solved',
   sortOrder = 'desc',
   onBranchChange,
   onYearChange,
@@ -19,7 +19,7 @@ export default function LeaderboardFilters({
     selectedBranch !== 'ALL' ||
     selectedYear !== 'ALL' ||
     searchQuery.trim() !== '' ||
-    sortBy !== 'total' ||
+    sortBy !== 'total_solved' ||
     sortOrder !== 'desc'
 
   return (
@@ -110,9 +110,12 @@ export default function LeaderboardFilters({
               onChange={(e) => onSortByChange(e.target.value)}
               aria-label="Sort students by metric"
             >
-              <option value="leetcode">LeetCode Solved</option>
-              <option value="name">Student Name (A-Z)</option>
-              <option value="rank">Campus Rank</option>
+              <option value="total_solved">Total Solved</option>
+              <option value="easy_solved">Easy Solved</option>
+              <option value="medium_solved">Medium Solved</option>
+              <option value="hard_solved">Hard Solved</option>
+              <option value="contest_rating">Contest Rating</option>
+              <option value="name">Student Name</option>
             </select>
 
             <button

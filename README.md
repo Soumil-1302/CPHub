@@ -152,6 +152,126 @@ Preview the production build locally:
 npm run preview
 ```
 
+## Email OTP Authentication
+
+The React login page at `/login` accepts valid student addresses ending in
+either `@dsu.cp.in` or `@dsu.edu.in`.
+Password registration uses Supabase Auth `signUp({ email, password })`, then
+confirms the account by calling `verifyOtp({ email, token, type: 'signup' })`.
+Password login uses `signInWithPassword`. The existing passwordless email-code
+sign-in remains available and uses `signInWithOtp({ shouldCreateUser: true })`
+with `verifyOtp({ type: 'email' })`. Signup confirmation resend uses
+`supabase.auth.resend({ type: 'signup', email })`.
+
+Supabase Auth generates and verifies the OTP codes and manages sessions.
+Brevo is the intended SMTP delivery provider; once custom SMTP is configured
+in Supabase Dashboard, Supabase Auth delivers its messages through Brevo.
+Repository code cannot confirm Dashboard settings. CPHub does not generate
+codes or send authentication email directly from React or its Edge Function.
+The PostgreSQL `on_auth_user_created` trigger creates a profile row linked to
+the new Auth user ID.
+
+### Supabase email templates
+
+Configure Supabase **Authentication → Email Templates → Confirm signup** to
+show the numeric signup confirmation token using `{{ .Token }}`. Example:
+
+```html
+<div style="font-family: Arial, sans-serif; color: #161618; max-width: 520px; margin: 0 auto; padding: 32px 24px;">
+  <div style="font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #10a09c;">CPHub</div>
+  <h1 style="font-size: 22px; margin: 28px 0 12px;">Verify your email</h1>
+  <p style="font-size: 16px; line-height: 1.5;">Enter this code on CPHub to verify your student account:</p>
+  <div style="margin: 24px 0; padding: 16px; background: #f5f5f4; border-radius: 8px; text-align: center; font-size: 32px; font-weight: 700; letter-spacing: 8px;">
+    {{ .Token }}
+  </div>
+  <p style="font-size: 14px; line-height: 1.5;">
+    Return to CPHub and enter the code in the signup verification form.
+  </p>
+  <p style="font-size: 13px; color: #71717a;">
+    If you did not request this code, you can ignore this email.
+  </p>
+</div>
+```
+
+The **Magic Link** template is used for the optional passwordless email-code
+sign-in and must also display `{{ .Token }}` for that code-entry flow. Do not
+use `{{ .ConfirmationURL }}` as the signup or passwordless sign-in verification
+method. Keep **Reset Password** separate: password recovery remains a link
+flow and its template should not be changed as part of signup OTP setup.
+
+### Configure Brevo SMTP in Supabase
+
+SMTP settings are managed in Supabase Dashboard, not in this repository:
+
+1. Verify the sending domain in Brevo and publish the DNS records Brevo
+   requires. Use an address on that verified domain as the sender.
+2. In Brevo, obtain SMTP credentials (an SMTP key, not a browser/API key).
+   Confirm the current relay host, port, and login values in Brevo.
+3. In Supabase, open **Authentication → SMTP Settings**, enable custom SMTP,
+   and enter the Brevo relay host, port, login, SMTP key, and verified sender
+   address/name.
+4. Save the settings and test delivery. Check Supabase Auth logs and Brevo
+   transactional email logs if messages fail.
+
+Brevo SMTP credentials must only be entered in Supabase's SMTP configuration
+or approved server-side secret storage. Never commit them to GitHub or source
+files, and never put them in a `VITE_*` variable.
+
+### Environment variables and limits
+
+The browser Supabase client requires these Vite variables. For local
+development, put them in `Frontend/.env.local`; set them separately in
+Vercel's project environment settings for deployment:
+
+```env
+VITE_SUPABASE_URL=https://<your-project>.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=<your-publishable-key>
+```
+
+These are browser configuration values; the publishable key is not an SMTP
+secret. Never expose a Supabase service-role key to the frontend. The
+`SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` variables
+used by the LeetCode Edge Function must be configured as server-side function
+secrets; the service-role key must never be included in the frontend bundle.
+
+The login UI applies a 60-second cooldown per normalized email address and
+blocks concurrent send, resend, and verification requests. This is a client
+safeguard only; it does not raise, bypass, or configure Supabase's server-side
+email limits. Review the current limits in Supabase **Authentication → Rate
+Limits** and configure them for the project and its SMTP provider. Supabase
+Auth limits still apply when using custom SMTP.
+
+Brevo sending quotas depend on the account, plan, and current provider
+restrictions. Check Brevo's dashboard for the active quota, usage, and sender
+verification state instead of assuming a fixed sending limit.
+
+### Password reset redirect
+
+The password reset form calls Supabase Auth
+`resetPasswordForEmail(email, { redirectTo })`. Add the production redirect URL
+`https://<your-vercel-domain>/login?mode=recovery` (and the local development
+equivalent) to Supabase **Authentication → URL Configuration → Redirect URLs**.
+The recovery callback is handled through the Supabase `PASSWORD_RECOVERY` auth
+event, and the new password is saved using `updateUser({ password })`.
+
+### Troubleshooting
+
+- **Too many OTP requests:** wait for the displayed cooldown and check Supabase
+  Authentication rate-limit settings. The client cooldown cannot override
+  server limits.
+- **Email not received:** check spam, Supabase Auth logs, Brevo transactional
+  logs, sender/domain verification, and SPF/DKIM status.
+- **SMTP rejected or delivery failed:** verify Brevo's current SMTP host, port,
+  login, SMTP key, and sender address in Supabase. Never paste credentials in
+  browser code or support messages.
+- **Incorrect or expired code:** use the newest code and request another after
+  the cooldown if it has expired.
+- **Network error:** check browser connectivity and the Supabase project URL.
+- **Unsupported email:** CPHub accepts only valid addresses ending in
+  `@dsu.cp.in` or `@dsu.edu.in`.
+
+Automated auth tests mock Supabase Auth and never send real email.
+
 ## LeetCode Statistics Provider
 
 LeetCode statistics are requested only by the authenticated

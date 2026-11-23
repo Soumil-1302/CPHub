@@ -17,6 +17,7 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true) // true while restoring
+  const [authEvent, setAuthEvent] = useState(null)
 
   useEffect(() => {
     // 1. Restore persisted session on mount
@@ -29,7 +30,8 @@ export function AuthProvider({ children }) {
     })
 
     // 2. Listen for future auth changes
-    const subscription = onAuthStateChange((newSession) => {
+    const subscription = onAuthStateChange((event, newSession) => {
+      setAuthEvent(event)
       setSession(newSession)
       setUser(newSession?.user ?? null)
       setLoading(false)
@@ -47,7 +49,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signOut: handleSignOut }}>
+    <AuthContext.Provider value={{ user, session, loading, authEvent, signOut: handleSignOut }}>
       {children}
     </AuthContext.Provider>
   )
