@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import FloatingNavbar from '../components/layout/FloatingNavbar'
 import ClosingCTA from '../components/layout/ClosingCTA'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 import {
-  getLeetcodeStats,
   getMyProfile,
+  getRegistrationDraft,
+  getMyLeetcodeStats,
+  registerMyProfile,
   refreshMyLeetcodeStats,
   updateMyProfile,
-} from '../services/databaseService'
+} from '../services/profileApi'
 import { ROUTES } from '../constants/routes'
 import '../styles/my-profile.css'
 
@@ -15,11 +17,9 @@ import '../styles/my-profile.css'
  * MyProfile page — view and edit the current user's own profile.
  *
  * Data flow:
- *   1. On mount, load the signed-in user's profile from Supabase.
- *   2. Render an editable form with all university + LeetCode fields.
- *   3. On save, call updateMyProfile() which:
- *      - server-side: RLS ensures `auth.uid() = id` (can't edit someone else's row)
- *      - client-side: we only ever pass the user's own auth UUID
+ *   1. Load the signed-in user's profile or unclaimed registration draft.
+ *   2. Complete registration or edit profile through the authenticated API.
+ *   3. Load and refresh LeetCode statistics through the backend.
  */
 
 const BRANCH_OPTIONS = [
@@ -39,13 +39,15 @@ export default function MyProfile({ navigate }) {
 
   // ── Profile data state ──
   const [profile, setProfile] = useState(null)
+  const [isRegistration, setIsRegistration] = useState(false)
   const [loadingProfile, setLoadingProfile] = useState(true)
   const [loadError, setLoadError] = useState(null)
 
   // ── Form state ──
   const [form, setForm] = useState({
+    username: '',
     display_name: '',
-    usn: '',
+    university: '',
     branch: '',
     graduation_year: '',
     leetcode_username: '',
@@ -58,56 +60,78 @@ export default function MyProfile({ navigate }) {
 
   // ── Load profile on mount (once auth is ready) ──
   const loadProfile = useCallback(async () => {
-    setLoadingProfile(true)
-    setLoadError(null)
-
-    const { data, error } = await getMyProfile()
-
-    if (error) {
-      setLoadError(error.message || 'Failed to load profile.')
-      setLoadingProfile(false)
-      return
-    }
-
-    setProfile(data)
-    if (data) {
+    try {
+      const data = await getMyProfile()
+      setLoadError(null)
+      setProfile(data)
+      setIsRegistration(false)
       setForm({
-        display_name: data.display_name || '',
-        usn: data.usn || '',
+        username: data.username || '',
+        display_name: data.full_name || data.display_name || '',
+        university: data.university || '',
         branch: data.branch || '',
-        graduation_year: data.graduation_year || '',
+        graduation_year: String(data.year_of_passing || ''),
         leetcode_username: data.leetcode_username || '',
       })
 
-      const { data: stats, error: statsError } = await getLeetcodeStats(data.id)
-      if (statsError) {
-        setStatsNotice({ type: 'error', message: statsError.message || 'Failed to load LeetCode stats.' })
-      } else {
-        setLeetcodeStats(stats)
+      try {
+        setLeetcodeStats(await getMyLeetcodeStats())
+        setStatsNotice(null)
+      } catch (error) {
+        setLeetcodeStats(null)
+        setStatsNotice({
+          type: 'error',
+          message: error.message || 'Failed to load LeetCode stats.',
+        })
       }
+    } catch (error) {
+      if (error.status === 404) {
+        try {
+          const draft = await getRegistrationDraft()
+          setLoadError(null)
+          setProfile(null)
+          setIsRegistration(true)
+          setForm({
+            username: draft.username || '',
+            display_name: draft.full_name || '',
+            university: draft.university || '',
+            branch: draft.branch || '',
+            graduation_year: String(draft.year_of_passing || ''),
+            leetcode_username: draft.leetcode_username || '',
+          })
+          setLeetcodeStats(null)
+        } catch (draftError) {
+          setLoadError(draftError.message || 'Failed to load your registration details.')
+        }
+      } else {
+        setLoadError(error.message || 'Failed to load profile.')
+      }
+    } finally {
+      setLoadingProfile(false)
     }
-    setLoadingProfile(false)
   }, [])
 
   useEffect(() => {
     if (!authLoading && user) {
-      loadProfile()
-    } else if (!authLoading && !user) {
-      setLoadingProfile(false)
+      const timeout = window.setTimeout(() => void loadProfile(), 0)
+      return () => window.clearTimeout(timeout)
     }
+    return undefined
   }, [authLoading, user, loadProfile])
 
   // ── Detect if form has unsaved changes ──
   const hasChanges = useMemo(() => {
+    if (isRegistration) return true
     if (!profile) return false
     return (
+      form.username !== (profile.username || '') ||
       form.display_name !== (profile.display_name || '') ||
-      form.usn !== (profile.usn || '') ||
+      form.university !== (profile.university || '') ||
       form.branch !== (profile.branch || '') ||
-      form.graduation_year !== (profile.graduation_year || '') ||
+      form.graduation_year !== String(profile.year_of_passing || '') ||
       form.leetcode_username !== (profile.leetcode_username || '')
     )
-  }, [form, profile])
+  }, [form, isRegistration, profile])
 
   // ── Handle field change ──
   function handleChange(field, value) {
@@ -121,29 +145,60 @@ export default function MyProfile({ navigate }) {
     setSaveNotice(null)
     setSaving(true)
 
-    const { data, error } = await updateMyProfile(form)
-    setSaving(false)
-
-    if (error) {
-      // Surface user-friendly messages for common constraint violations
-      const msg = error.message || 'Failed to save profile.'
-      if (msg.includes('usn') && msg.includes('unique')) {
-        setSaveNotice({ type: 'error', message: 'This USN is already taken by another student.' })
-      } else if (msg.includes('display_name_length')) {
-        setSaveNotice({ type: 'error', message: 'Display name is too long (max 100 characters).' })
-      } else if (msg.includes('grad_year_format')) {
-        setSaveNotice({ type: 'error', message: 'Graduation year must be a 4-digit year.' })
-      } else if (msg.includes('lc_username_length')) {
-        setSaveNotice({ type: 'error', message: 'LeetCode username is too long (max 40 characters).' })
-      } else {
-        setSaveNotice({ type: 'error', message: msg })
-      }
-      return
+    const registration = {
+      username: form.username,
+      full_name: form.display_name,
+      university: form.university,
+      branch: form.branch,
+      year_of_passing: Number(form.graduation_year),
+      leetcode_username: form.leetcode_username,
+    }
+    const updates = {
+      username: form.username,
+      display_name: form.display_name,
+      university: form.university,
+      branch: form.branch,
+      year_of_passing: Number(form.graduation_year),
+      leetcode_profile_url: form.leetcode_username
+        ? `https://leetcode.com/u/${encodeURIComponent(form.leetcode_username)}/`
+        : null,
     }
 
-    // Update local state to reflect saved data
-    setProfile(data)
-    setSaveNotice({ type: 'success', message: 'Profile saved successfully!' })
+    try {
+      const registering = isRegistration
+      const data = registering
+        ? await registerMyProfile(registration)
+        : await updateMyProfile(updates)
+      setProfile(data)
+      setIsRegistration(false)
+      setForm({
+        username: data.username || '',
+        display_name: data.full_name || data.display_name || '',
+        university: data.university || '',
+        branch: data.branch || '',
+        graduation_year: String(data.year_of_passing || ''),
+        leetcode_username: data.leetcode_username || '',
+      })
+      setSaveNotice({ type: 'success', message: 'Profile saved successfully!' })
+      if (registering) {
+        try {
+          setLeetcodeStats(await refreshMyLeetcodeStats())
+          setStatsNotice({ type: 'success', message: 'LeetCode stats synced successfully.' })
+        } catch (syncError) {
+          setStatsNotice({
+            type: 'error',
+            message: syncError.message || 'Profile saved, but LeetCode stats could not be synced yet.',
+          })
+        }
+      }
+    } catch (error) {
+      setSaveNotice({
+        type: 'error',
+        message: error.message || 'Failed to save profile.',
+      })
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function handleRefreshStats() {
@@ -151,21 +206,11 @@ export default function MyProfile({ navigate }) {
     setRefreshingStats(true)
 
     try {
-      const { data, error } = await refreshMyLeetcodeStats()
-      if (error) {
-        setStatsNotice({
-          type: 'error',
-          message: error.message || 'Could not refresh LeetCode stats. Your last saved stats are unchanged.',
-        })
-        return
-      }
-
-      setLeetcodeStats(data?.stats || null)
+      const data = await refreshMyLeetcodeStats()
+      setLeetcodeStats(data)
       setStatsNotice({
         type: 'success',
-        message: data?.cached
-          ? 'Your recent LeetCode stats are up to date.'
-          : 'LeetCode stats refreshed successfully.',
+        message: 'LeetCode stats refreshed successfully.',
       })
     } catch (error) {
       setStatsNotice({
@@ -183,7 +228,7 @@ export default function MyProfile({ navigate }) {
     form.leetcode_username.trim().toLowerCase() ===
     (profile?.leetcode_username || '').trim().toLowerCase()
   const statsMatchCurrentUsername =
-    leetcodeStats?.provider_username?.toLowerCase() ===
+    (leetcodeStats?.username || leetcodeStats?.provider_username)?.toLowerCase() ===
     (profile?.leetcode_username || '').trim().toLowerCase()
 
   // ── Not signed in ──
@@ -251,7 +296,10 @@ export default function MyProfile({ navigate }) {
               <button
                 type="button"
                 className="auth-submit-btn"
-                onClick={loadProfile}
+                onClick={() => {
+                  setLoadingProfile(true)
+                  void loadProfile()
+                }}
               >
                 <span>Retry</span>
                 <span aria-hidden="true">↻</span>
@@ -286,10 +334,13 @@ export default function MyProfile({ navigate }) {
                 {(form.display_name || user?.email || '?')[0].toUpperCase()}
               </div>
               <h1 className="auth-title">
-                My <span className="italic-serif">Profile</span>
+                {isRegistration ? 'Complete your ' : 'My '}
+                <span className="italic-serif">Profile</span>
               </h1>
               <p className="auth-desc">
-                Update your CPHub profile. This information appears on the leaderboard.
+                {isRegistration
+                  ? 'Choose your public username and add your university and LeetCode details to join the leaderboard.'
+                  : 'Update your CPHub profile. Public profile details appear on the leaderboard.'}
               </p>
               <div className="myprofile-email-pill">
                 {user?.email}
@@ -312,6 +363,7 @@ export default function MyProfile({ navigate }) {
                     placeholder="Your display name"
                     className="form-input"
                     maxLength={100}
+                    required
                     disabled={saving}
                   />
                 </div>
@@ -320,26 +372,45 @@ export default function MyProfile({ navigate }) {
                 </span>
               </div>
 
-              {/* USN */}
+              {/* Public username */}
               <div className="form-group">
-                <label htmlFor="profile-usn" className="form-label">
-                  University Serial Number (USN)
+                <label htmlFor="profile-username" className="form-label">
+                  CPHub Username
                 </label>
                 <div className="form-input-wrapper">
                   <input
-                    id="profile-usn"
+                    id="profile-username"
                     type="text"
-                    value={form.usn}
-                    onChange={(e) => handleChange('usn', e.target.value.toUpperCase())}
-                    placeholder="1DS22CS001"
+                    value={form.username}
+                    onChange={(e) => handleChange('username', e.target.value.toLowerCase())}
+                    placeholder="your_public_username"
                     className="form-input"
+                    minLength={3}
                     maxLength={30}
+                    required
                     disabled={saving}
                   />
                 </div>
                 <span className="myprofile-field-hint">
-                  Your unique university ID. Must be unique across all students.
+                  Used in your public profile link. Use 3–30 letters, numbers, or underscores.
                 </span>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="profile-university" className="form-label">
+                  University
+                </label>
+                <input
+                  id="profile-university"
+                  type="text"
+                  value={form.university}
+                  onChange={(e) => handleChange('university', e.target.value)}
+                  placeholder="Your university"
+                  className="form-input"
+                  maxLength={120}
+                  required
+                  disabled={saving}
+                />
               </div>
 
               {/* Branch + Graduation Year — side by side */}
@@ -353,6 +424,7 @@ export default function MyProfile({ navigate }) {
                     value={form.branch}
                     onChange={(e) => handleChange('branch', e.target.value)}
                     className="form-input form-select"
+                    required
                     disabled={saving}
                   >
                     {BRANCH_OPTIONS.map((b) => (
@@ -372,6 +444,7 @@ export default function MyProfile({ navigate }) {
                     value={form.graduation_year}
                     onChange={(e) => handleChange('graduation_year', e.target.value)}
                     className="form-input form-select"
+                    required
                     disabled={saving}
                   >
                     {GRADUATION_YEAR_OPTIONS.map((y) => (
@@ -409,6 +482,7 @@ export default function MyProfile({ navigate }) {
                     placeholder="aarav_codes"
                     className="form-input"
                     maxLength={40}
+                    required
                     disabled={saving}
                   />
                 </div>
@@ -417,7 +491,7 @@ export default function MyProfile({ navigate }) {
                 </span>
               </div>
 
-              <section className="form-group" aria-labelledby="leetcode-stats-title">
+              {profile && <section className="form-group" aria-labelledby="leetcode-stats-title">
                 <h2 id="leetcode-stats-title" className="form-label">LeetCode Statistics</h2>
                 <p className="myprofile-field-hint">
                   Stats are refreshed securely by the server. CPHub never asks for your LeetCode password or session.
@@ -464,7 +538,7 @@ export default function MyProfile({ navigate }) {
                     <p style={{ margin: 0 }}>{statsNotice.message}</p>
                   </div>
                 )}
-              </section>
+              </section>}
 
               {/* Timestamps (read-only info) */}
               {profile?.created_at && (
@@ -501,7 +575,8 @@ export default function MyProfile({ navigate }) {
             )}
 
             <div className="auth-footer-note">
-              Your profile is linked to your Supabase Auth account. Only you can edit it.
+              Your university email remains private. Your CPHub username, display name,
+              university, branch, graduation year, and linked LeetCode statistics are public.
             </div>
           </div>
         </div>

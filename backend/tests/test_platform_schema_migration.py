@@ -5,24 +5,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 MIGRATION_PATHS = (
     ROOT / "supabase" / "migrations" / "007_platform_architecture.sql",
-    ROOT / "Frontend" / "supabase" / "migrations" / "007_platform_architecture.sql",
 )
 AUTH_MIGRATION_PATHS = (
     ROOT / "supabase" / "migrations" / "008_passwordless_registration.sql",
-    ROOT / "Frontend" / "supabase" / "migrations" / "008_passwordless_registration.sql",
 )
 LEETCODE_PROFILE_MIGRATION_PATHS = (
     ROOT / "supabase" / "migrations" / "009_leetcode_public_profile_cache.sql",
-    ROOT / "Frontend" / "supabase" / "migrations" / "009_leetcode_public_profile_cache.sql",
 )
 PUBLIC_PROFILE_MIGRATION_PATHS = (
     ROOT / "supabase" / "migrations" / "010_public_profile_analytics.sql",
-    ROOT / "Frontend" / "supabase" / "migrations" / "010_public_profile_analytics.sql",
 )
 LEADERBOARD_MIGRATION_PATHS = (
     ROOT / "supabase" / "migrations" / "011_leaderboard_public_statistics.sql",
-    ROOT / "Frontend" / "supabase" / "migrations" / "011_leaderboard_public_statistics.sql",
 )
+SECURITY_MIGRATION_PATH = ROOT / "supabase" / "migrations" / "012_security_hardening.sql"
 
 
 class PlatformSchemaMigrationTests(unittest.TestCase):
@@ -30,8 +26,8 @@ class PlatformSchemaMigrationTests(unittest.TestCase):
         self.migrations = [path.read_text(encoding="utf-8") for path in MIGRATION_PATHS]
         self.migration = self.migrations[0].lower()
 
-    def test_both_migration_copies_match(self) -> None:
-        self.assertEqual(self.migrations[0], self.migrations[1])
+    def test_canonical_migration_is_loaded(self) -> None:
+        self.assertEqual(len(self.migrations), 1)
 
     def test_migration_does_not_destroy_existing_data(self) -> None:
         without_comments = "\n".join(
@@ -45,9 +41,9 @@ class PlatformSchemaMigrationTests(unittest.TestCase):
         self.assertNotIn("truncate ", without_comments)
         self.assertNotIn("drop column", without_comments)
 
-    def test_passwordless_migration_is_additive_and_identical_in_both_apps(self) -> None:
+    def test_passwordless_migration_is_additive(self) -> None:
         migrations = [path.read_text(encoding="utf-8") for path in AUTH_MIGRATION_PATHS]
-        self.assertEqual(migrations[0], migrations[1])
+        self.assertEqual(len(migrations), 1)
         migration = migrations[0].lower()
         without_comments = "\n".join(
             line for line in migration.splitlines() if not line.strip().startswith("--")
@@ -66,12 +62,12 @@ class PlatformSchemaMigrationTests(unittest.TestCase):
         self.assertIn("on conflict (user_id) do nothing", migration)
         self.assertIn("p_leetcode_username !~", migration)
 
-    def test_leetcode_profile_cache_migration_is_additive_and_identical(self) -> None:
+    def test_leetcode_profile_cache_migration_is_additive(self) -> None:
         migrations = [
             path.read_text(encoding="utf-8")
             for path in LEETCODE_PROFILE_MIGRATION_PATHS
         ]
-        self.assertEqual(migrations[0], migrations[1])
+        self.assertEqual(len(migrations), 1)
         migration = migrations[0].lower()
         without_comments = "\n".join(
             line for line in migration.splitlines() if not line.strip().startswith("--")
@@ -143,7 +139,7 @@ class PlatformSchemaMigrationTests(unittest.TestCase):
             path.read_text(encoding="utf-8")
             for path in PUBLIC_PROFILE_MIGRATION_PATHS
         ]
-        self.assertEqual(migrations[0], migrations[1])
+        self.assertEqual(len(migrations), 1)
         migration = migrations[0].lower()
         without_comments = "\n".join(
             line for line in migration.splitlines() if not line.strip().startswith("--")
@@ -183,7 +179,7 @@ class PlatformSchemaMigrationTests(unittest.TestCase):
             path.read_text(encoding="utf-8")
             for path in LEADERBOARD_MIGRATION_PATHS
         ]
-        self.assertEqual(migrations[0], migrations[1])
+        self.assertEqual(len(migrations), 1)
         migration = migrations[0].lower()
         without_comments = "\n".join(
             line for line in migration.splitlines() if not line.strip().startswith("--")
@@ -214,6 +210,24 @@ class PlatformSchemaMigrationTests(unittest.TestCase):
             "'dashboard_preferences'",
         ):
             self.assertNotIn(private_key, migration)
+
+    def test_security_hardening_migration_preserves_policies_and_limits_trigger_access(self) -> None:
+        migration = SECURITY_MIGRATION_PATH.read_text(encoding="utf-8").lower()
+        without_comments = "\n".join(
+            line for line in migration.splitlines() if not line.strip().startswith("--")
+        )
+
+        self.assertIn("begin;", migration)
+        self.assertIn("commit;", migration)
+        self.assertNotIn("drop policy", without_comments)
+        self.assertNotIn("drop table", without_comments)
+        self.assertNotIn("delete from", without_comments)
+        self.assertNotIn("truncate ", without_comments)
+        self.assertIn("alter function public.handle_updated_at() set search_path = ''", migration)
+        self.assertIn("alter function public.sync_leetcode_stats_columns() set search_path = ''", migration)
+        self.assertIn("revoke all on function public.handle_new_user()", migration)
+        self.assertIn("using ((select auth.uid()) = user_id)", migration)
+        self.assertIn("create index if not exists leetcode_fetch_state_user_id_idx", migration)
 
 
 if __name__ == "__main__":

@@ -64,11 +64,23 @@ function AppRouter() {
     content = <Login navigate={navigate} />
   } else if (path === ROUTES.LEADERBOARD) {
     content = <Leaderboard navigate={navigate} />
-  } else if (path.startsWith(ROUTES.PROFILE_BASE + '/') || path === ROUTES.PROFILE_BASE) {
-    const rawUsername = path.startsWith(ROUTES.PROFILE_BASE + '/')
-      ? path.slice((ROUTES.PROFILE_BASE + '/').length)
+  } else if (
+    path.startsWith(`${ROUTES.PROFILE_BASE}/`) ||
+    path === ROUTES.PROFILE_BASE ||
+    path.startsWith(`${ROUTES.LEGACY_PROFILE_BASE}/`) ||
+    path === ROUTES.LEGACY_PROFILE_BASE
+  ) {
+    const profileBase = path.startsWith(`${ROUTES.LEGACY_PROFILE_BASE}/`) || path === ROUTES.LEGACY_PROFILE_BASE
+      ? ROUTES.LEGACY_PROFILE_BASE
+      : ROUTES.PROFILE_BASE
+    const rawUsername = path.startsWith(`${profileBase}/`)
+      ? path.slice(`${profileBase}/`.length)
       : ''
-    const username = decodeURIComponent(rawUsername).replace(/^\/+|\/+$/g, '')
+    let username = ''
+    try {
+      username = decodeURIComponent(rawUsername)
+    } catch { /* malformed paths resolve to the not-found profile state */ }
+    username = username.replace(/^\/+|\/+$/g, '')
     content = <Profile username={username} navigate={navigate} />
   } else if (path === ROUTES.RESOURCES) {
     content = <Resources navigate={navigate} />

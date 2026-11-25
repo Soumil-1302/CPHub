@@ -25,7 +25,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
   throw new Error(
     `[CPHub] Missing Supabase environment variable(s): ${missing.join(', ')}.\n` +
-    `Create a .env.local file in Frontend/ (the Vite project root) with:\n\n` +
+    `Create a .env.local file in the repository root with:\n\n` +
     `  VITE_SUPABASE_URL=https://<your-project>.supabase.co\n` +
     `  VITE_SUPABASE_PUBLISHABLE_KEY=<your-anon-key>\n\n` +
     `You can find both values in the Supabase dashboard under Settings → API.`

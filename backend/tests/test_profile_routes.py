@@ -828,7 +828,6 @@ class ProfileRouteTests(unittest.TestCase):
     def test_security_migration_restricts_base_tables_and_projects_public_profile(self) -> None:
         migration_path = (
             Path(__file__).resolve().parents[2]
-            / "Frontend"
             / "supabase"
             / "migrations"
             / "006_secure_public_profile_access.sql"
@@ -851,7 +850,6 @@ class ProfileRouteTests(unittest.TestCase):
     def test_migration_adds_username_without_changing_existing_rls_policies(self) -> None:
         migration_path = (
             Path(__file__).resolve().parents[2]
-            / "Frontend"
             / "supabase"
             / "migrations"
             / "003_user_profiles_api.sql"
