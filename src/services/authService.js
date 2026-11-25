@@ -6,6 +6,7 @@
  */
 import { supabase } from './supabaseClient.js'
 import { createAuthService } from './authServiceCore.js'
+import { apiRequest } from './api.js'
 
 const authService = createAuthService(supabase.auth)
 
@@ -21,6 +22,22 @@ export const {
   updatePassword,
   signOut,
 } = authService
+
+export async function requestEmailOtp(email, intent) {
+  try {
+    const data = await apiRequest('/api/auth/otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, intent }),
+    })
+    return { ok: true, message: data.message }
+  } catch (error) {
+    return {
+      ok: false,
+      category: error?.code || 'otp_request_failed',
+      message: error?.message || 'Unable to send a verification code. Please try again.',
+    }
+  }
+}
 
 /**
  * Returns the current session (or null) from local storage / cookies.

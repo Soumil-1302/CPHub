@@ -60,14 +60,11 @@ duplicate Auth account creation, and asks Supabase Auth to send the OTP. It
 returns the same response for known and unknown addresses. Supabase Auth
 enforces its configured delivery rate limits; the frontend additionally
 applies a 60-second resend cooldown.
-Apply `Frontend/supabase/migrations/008_passwordless_registration.sql` to the
-intended Supabase project before enabling this route and profile completion.
-Apply `Frontend/supabase/migrations/009_leetcode_public_profile_cache.sql`
-after migrations 007 and 008 before deploying this LeetCode service version.
-Apply `Frontend/supabase/migrations/010_public_profile_analytics.sql` after
-migration 009 to serve cached activity and topic analytics in public profiles.
-Apply `Frontend/supabase/migrations/011_leaderboard_public_statistics.sql`
-after migration 010 and before deploying the leaderboard response/UI update.
+The live project contains the functions and columns from migrations 008–011,
+but its Supabase CLI ledger records only migrations 001–005. Do not reapply
+those SQL files or run `supabase db push` until the ledger has been reconciled.
+Migration 012 is a local security hardening migration; it has not been applied
+to production and requires review before use.
 
 ## Run
 
@@ -160,18 +157,19 @@ filters, and ordering are applied before the response is returned.
 student records, so filters and onboarding remain usable when the database is
 empty.
 
-Apply `Frontend/supabase/migrations/005_public_leaderboard.sql` after migrations
-001–004. It creates the leaderboard RPC with an explicit public projection and
-adds indexes for leaderboard filters and supported numeric sorts.
+For a new project, apply `supabase/migrations/005_public_leaderboard.sql`
+after migrations 001–004. It creates the leaderboard RPC with an explicit
+public projection and adds indexes for leaderboard filters and supported
+numeric sorts. The live project records migration 005 as applied.
 
-Then apply `Frontend/supabase/migrations/006_secure_public_profile_access.sql`
+For a new project, then apply `supabase/migrations/006_secure_public_profile_access.sql`
 in the Supabase Dashboard SQL Editor. This migration removes anonymous access
 to the underlying `profiles` and `leetcode_stats` tables, restricts direct
 authenticated reads to each user's own rows, and leaves RLS enabled. Public
 profile and leaderboard reads continue through narrowly projected RPCs; those
 functions do not return profile IDs, email addresses, or private statistics.
-Run the complete migration file after 005 and verify it succeeds before
-deploying this backend version. The migration is also mirrored at
+Live checks confirmed the access policy from this migration is active: RLS is
+enabled and anonymous table reads are denied. The migration is also mirrored at
 `supabase/migrations/006_secure_public_profile_access.sql`.
 
 ### LeetCode statistics
@@ -209,7 +207,7 @@ cache is returned without making an external request. Errors return a stable
 when a refresh fails.
 
 For frontend development, set `VITE_API_BASE_URL=http://localhost:8000` in
-`Frontend/.env.local`; set it to the deployed FastAPI origin in Vercel. This
+the repository-root `.env.local`; set it to the deployed FastAPI origin in Vercel. This
 value is only an API URL, not a credential. Set the corresponding frontend
 origin in backend `FRONTEND_ORIGINS`. Never put the Supabase service-role key
 or any server credential in a `VITE_*` variable.
@@ -222,8 +220,8 @@ against the backend branch catalogue; no frontend data file is required.
 ## Database migration
 
 The existing schema already provides `public.profiles`, the Auth-user foreign
-key, profile timestamps, signup trigger, and RLS. Apply
-`Frontend/supabase/migrations/003_user_profiles_api.sql` after migrations 001
+key, profile timestamps, signup trigger, and RLS. For a new project, apply
+`supabase/migrations/003_user_profiles_api.sql` after migrations 001
 and 002. It adds a nullable username column and case-insensitive unique index
 for legacy-safe profile claiming, plus an atomic function that fills
 trigger-created placeholder profiles without overwriting existing non-empty
@@ -234,7 +232,7 @@ To apply it:
 
 1. Open the existing Supabase project in the Dashboard and select **SQL
    Editor**.
-2. Open `Frontend/supabase/migrations/003_user_profiles_api.sql` locally,
+2. Open `supabase/migrations/003_user_profiles_api.sql` locally,
    copy its complete contents into a new SQL query, and run it.
 3. Confirm the query succeeds. In **Table Editor → profiles**, verify the
    nullable `username` column and its unique index.
@@ -247,13 +245,13 @@ to production, confirm prior migrations 001 and 002 have been applied.
 
 The LeetCode cache uses the existing tables and fetch-claim RPCs from
 migration 002. Apply
-`Frontend/supabase/migrations/004_leetcode_stats_metadata.sql` after migrations
+`supabase/migrations/004_leetcode_stats_metadata.sql` after migrations
 001 and 002 to add nullable optional-stat columns and an atomic success RPC
 that persists those fields without weakening RLS:
 
 1. In the Supabase Dashboard, open **SQL Editor**.
 2. Copy the full contents of
-   `Frontend/supabase/migrations/004_leetcode_stats_metadata.sql` into a new
+   `supabase/migrations/004_leetcode_stats_metadata.sql` into a new
    query and run it.
 3. Confirm it succeeds before deploying the backend code that calls
    `finish_leetcode_fetch_success_v2`.
@@ -261,12 +259,10 @@ that persists those fields without weakening RLS:
 Apply migration 005 only after migration 004, because the leaderboard reads
 the optional contest-rating column introduced there.
 
-The current platform schema also requires migration 007 for the normalized
-LeetCode account/activity/topic/sync tables. Migration 007 was reported as
-applied by the project owner. Apply migration 008 for OTP registration if it
-has not already been applied, then apply
-`Frontend/supabase/migrations/009_leetcode_public_profile_cache.sql` before
-deploying this version of the LeetCode service. Migration 009 is additive; it
+The current platform schema requires migration 007 for normalized LeetCode
+account/activity/topic/sync tables. The live project has those tables and the
+expected changes from migrations 008–011, although its CLI history does not
+record them. Do not apply those files again. Migration 009 is additive; it
 adds cached public profile metadata, optional total-submission/acceptance-rate
 fields, and an atomic sync RPC. It preserves saved optional values when LeetCode
 omits them for the same handle, avoids carrying old-handle values into a

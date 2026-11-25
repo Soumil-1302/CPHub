@@ -1,14 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import FloatingNavbar from '../components/layout/FloatingNavbar'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 import {
   isAllowedEmail,
-  sendOtp,
-  signUp,
+  requestEmailOtp,
   signInWithPassword,
   verifyOtp,
-  verifySignupOtp,
-  resendSignupOtp,
   requestPasswordReset,
   updatePassword,
 } from '../services/authService'
@@ -26,7 +23,7 @@ import { ROUTES } from '../constants/routes'
 import '../styles/auth.css'
 
 /**
- * Login page for password, email-code, signup, and password recovery flows.
+ * Login page for email-code registration/sign-in and legacy password recovery.
  * Supabase Auth state changes are observed by AuthContext.
  */
 export default function Login({ navigate }) {
@@ -154,7 +151,7 @@ export default function Login({ navigate }) {
 
     setLoading(true)
     try {
-      const res = await sendOtp(email)
+      const res = await requestEmailOtp(email, 'login')
       startCooldown(email)
       if (res.ok) {
         setStep('verify')
@@ -191,9 +188,7 @@ export default function Login({ navigate }) {
 
     setLoading(true)
     try {
-      const res = authMode === 'signup-verify'
-        ? await verifySignupOtp(email, code)
-        : await verifyOtp(email, code)
+      const res = await verifyOtp(email, code, 'email')
       if (res.ok) {
         setNotice({
           type: 'success',
@@ -222,8 +217,8 @@ export default function Login({ navigate }) {
     setLoading(true)
     try {
       const res = authMode === 'signup-verify'
-        ? await resendSignupOtp(email)
-        : await sendOtp(email)
+        ? await requestEmailOtp(email, 'register')
+        : await requestEmailOtp(email, 'login')
       startCooldown(email)
       if (res.ok) {
         setOtpDigits(Array(OTP_LENGTH).fill(''))
@@ -252,7 +247,7 @@ export default function Login({ navigate }) {
 
     setLoading(true)
     try {
-      const result = await signUp(email, password)
+      const result = await requestEmailOtp(email, 'register')
       if (result.ok) {
         startCooldown(email)
         setAuthMode('signup-verify')
@@ -408,7 +403,7 @@ export default function Login({ navigate }) {
               </h1>
               <p className="auth-desc">
                 {authMode === 'signup'
-                  ? 'Create an account with your university email and password.'
+                  ? 'Create an account with your university email and a verification code.'
                   : authMode === 'password'
                     ? 'Sign in with your university email and password.'
                     : authMode === 'reset-password'
@@ -571,17 +566,6 @@ export default function Login({ navigate }) {
                   <span className="auth-domain-hint">Only {allowedEmailDomains} accounts can register.</span>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="signup-password" className="form-label">Password</label>
-                  <input
-                    id="signup-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="form-input"
-                    required
-                    autoComplete="new-password"
-                    disabled={loading}
-                  />
                 </div>
                 <button type="submit" className="auth-submit-btn" disabled={loading || cooldown > 0}>
                   {loading ? 'Creating account…' : cooldown > 0 ? `Please wait ${cooldown}s` : 'Create Account'}

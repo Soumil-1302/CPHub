@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test": "npm --prefix Frontend test",
-    "lint": "npm --prefix Frontend run lint",
+    "test": "node --test",
+    "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {

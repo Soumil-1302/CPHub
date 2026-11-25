@@ -4,14 +4,14 @@
  * Restores the existing Supabase session on page reload and listens for
  * auth state changes (sign-in, sign-out, token refresh) in real time.
  */
-import { createContext, useContext, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
   getSession,
   onAuthStateChange,
   signOut as authSignOut,
 } from '../services/authService'
 
-const AuthContext = createContext(null)
+import AuthContext from './authContextStore'
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
@@ -53,16 +53,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   )
-}
-
-/**
- * Hook to access auth state from any component.
- * @returns {{ user: object|null, session: object|null, loading: boolean, signOut: () => Promise }}
- */
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) {
-    throw new Error('useAuth must be used inside an <AuthProvider>')
-  }
-  return ctx
 }

@@ -8,16 +8,14 @@ statistics, and leaderboard data stored in Supabase PostgreSQL.
 ## Architecture
 
 ```text
-Frontend/                         React 19 + Vite application
-  src/
-    pages/                        Home, login, leaderboard, profiles, resources
-    context/AuthContext.jsx       Supabase session restoration and auth events
-    services/authService.js       OTP, session, and logout
-    services/api.js               Shared FastAPI requests and bearer token
-    services/profileApi.js        Profile and branch API
-    services/leaderboardApi.js    Leaderboard API
-    services/leetcodeApi.js       Private stats and refresh API
-  supabase/migrations/            Database migrations 001–011
+src/                              React 19 + Vite application
+  pages/                          Home, login, leaderboard, profiles, resources
+  context/AuthContext.jsx         Supabase session restoration and auth events
+  services/authService.js         OTP, session, and logout
+  services/api.js                 Shared FastAPI requests and bearer token
+  services/profileApi.js          Profile, branch, and LeetCode API
+  services/leaderboardApi.js      Leaderboard API
+supabase/migrations/              Database migrations 001–012
 
 backend/                          FastAPI application
   app/routes/                     Health, profile, LeetCode, leaderboard, branches
@@ -34,12 +32,10 @@ returned through explicitly projected database functions; direct table reads
 are owner-restricted by RLS. LeetCode statistics are fetched and cached by the
 backend, not by React.
 
-The workspace also contains a legacy root-level `src/` snapshot. `Frontend/`
-is the canonical React application. The root Vite configuration points to
-`Frontend/`, so root-level Vite commands and commands run inside `Frontend/`
-serve the same application. The root `package.json` is valid. The
-`Frontend/src/services/databaseService.js` file is a legacy, unused data-service
-facade; active pages use the centralized API services listed above.
+The repository root is the canonical frontend project: `src/`, `index.html`,
+`vite.config.js`, and `package.json` are built together from the root. The
+`Frontend/` submodule pointer on the recovery branch is not the deployed app
+source. The root package scripts run the frontend test suite, lint, and build.
 
 ## Requirements and dependencies
 
@@ -49,7 +45,7 @@ facade; active pages use the centralized API services listed above.
 - A valid LeetCode username is collected at registration; public profile
   statistics are loaded from LeetCode when available.
 
-Frontend dependencies are declared in `Frontend/package.json`: React, React
+Frontend dependencies are declared in the root `package.json`: React, React
 DOM, Supabase JS, Vite, and ESLint. Backend dependencies are declared in
 `backend/requirements.txt`:
 
@@ -62,9 +58,8 @@ DOM, Supabase JS, Vite, and ESLint. Backend dependencies are declared in
 ## Frontend setup
 
 ```bash
-cd Frontend
 npm install
-cp ../.env.example ../.env.local
+cp .env.example .env.local
 ```
 
 Set the frontend values in the repository-root `.env.local` file (Vite loads
@@ -139,9 +134,9 @@ and protected endpoints require the backend environment and database setup.
 ## Supabase configuration
 
 1. Configure the Supabase **Magic Link** email template to display the numeric
-   token using `{{ .Token }}`. Registration and returning sign-in both use
-   Supabase email OTP (`type: email`); CPHub does not collect or authenticate
-   passwords.
+   token using `{{ .Token }}`. Registration and returning sign-in use
+   Supabase email OTP (`type: email`). Legacy password login and recovery
+   remain available to existing accounts.
 2. Keep Supabase email signup enabled for first-time registration and configure
    the project's Auth rate limits. Returning sign-in explicitly disables
    account creation. The backend returns the same OTP-request response for
@@ -167,18 +162,18 @@ Supabase CLI after linking the intended project):
 | `004_leetcode_stats_metadata.sql` | Optional rating/ranking fields and successful-refresh RPC. |
 | `005_public_leaderboard.sql` | Database-backed leaderboard projection, filters, sorting, and pagination. |
 | `006_secure_public_profile_access.sql` | Owner-only direct table reads and safe public profile/leaderboard RPC access. |
-| `007_platform_architecture.sql` | Applied successfully in the Supabase SQL Editor (reported); additive profile fields, normalized LeetCode/account/activity/topic/sync/preferences tables, RLS, and legacy-data backfills. |
+| `007_platform_architecture.sql` | Adds profile fields, normalized LeetCode/account/activity/topic/sync/preferences tables, RLS, and legacy-data backfills; live schema verified. |
 | `008_passwordless_registration.sql` | Adds a service-role-only account-existence check and atomic registration completion, including the LeetCode link and initial stats row. |
 | `009_leetcode_public_profile_cache.sql` | Adds the optional LeetCode public-profile cache and atomic stats/profile sync RPC. |
 | `010_public_profile_analytics.sql` | Extends the public-profile RPC with privacy-filtered cached LeetCode activity and topic analytics. |
 | `011_leaderboard_public_statistics.sql` | Extends the public leaderboard with approved identity/stat fields and adds a cached-total ordering index. |
+| `012_security_hardening.sql` | Restricts trigger-only function execution, pins trigger search paths, and optimizes owner RLS checks. |
 
 ### Migration 007 review and existing-data impact
 
 `007_platform_architecture.sql` was reported as **successfully applied** in
-the Supabase SQL Editor. Do not run it again. The SQL Editor success has not
-been independently verified from this workspace; confirm the schema and RLS
-checks below in the target Supabase project. It is a transaction-wrapped,
+the Supabase SQL Editor and its expected tables and columns were verified in
+the live project on 2026-11-26. Do not run it again. It is a transaction-wrapped,
 forward-only migration: it does not drop tables or columns, truncate tables,
 or delete existing rows. Existing column names used by the current FastAPI
 application remain available so the current code can continue using migrations
@@ -231,17 +226,16 @@ The migration makes these changes:
 
 The profile and stats backfills scan existing rows and cached JSON, so runtime
 depends on project size and may briefly hold table locks. The transaction
-rolls back the complete migration if a statement fails. Application success
-was reported by the user; post-migration schema, data, and RLS behavior still
-need verification in the live project.
+rolls back the complete migration if a statement fails.
 
 ### Migration 008 and authentication impact
 
-Migration `008_passwordless_registration.sql` is new and has **not** been run
-against the live Supabase project from this workspace. It is additive and
+Migration `008_passwordless_registration.sql` is not recorded in the live
+migration ledger, but its RPC functions were verified in the schema on
+2026-11-26. The migration is additive and
 transaction-wrapped; it does not drop tables, delete rows, or alter existing
-records. Before deploying the new backend/frontend, apply migration 008 once
-in the intended Supabase project. It:
+records. The live project contains both RPCs; do not apply this migration a
+second time. It:
 
 - Adds `auth_user_exists(email)`, a `SECURITY DEFINER` function executable only
   by `service_role`; the public OTP endpoint never returns its result.
@@ -252,17 +246,16 @@ in the intended Supabase project. It:
 - Keeps the existing Auth identity, LeetCode-account trigger, RLS policies,
   and Brevo SMTP configuration intact.
 
-Migration files are in `Frontend/supabase/migrations/`. A mirror is maintained
-in the root `supabase/migrations/` directory. For an existing project, apply
+Migration files are in `supabase/migrations/`. For an existing project, apply
 only migrations that are not already installed; do not rerun earlier
-production migrations just because the checked-in source has changed. In
-particular, apply migration 006 before deploying the backend code that reads
-public profiles through its new RPC. Verify that RLS remains enabled and that
-direct anonymous reads of `profiles` and `leetcode_stats` are denied.
+production migrations just because the checked-in source has changed. Live
+checks confirmed migration 006's access model: RLS is enabled and anonymous
+table reads of `profiles` and `leetcode_stats` are denied. Its version is not
+recorded in the CLI migration ledger.
 
-Migration `009_leetcode_public_profile_cache.sql` is new and has not been
-applied to the live Supabase project. Apply it after migrations 007 and 008
-before deploying the latest LeetCode service. It is additive and
+Migration `009_leetcode_public_profile_cache.sql` is not recorded in the live
+migration ledger, but its statistics columns were verified in the schema on
+2026-11-26. Do not apply it a second time. It is additive and
 transaction-wrapped: it adds a nullable JSONB cache column and a service-role
 RPC; it neither drops nor deletes existing data. The migration also clears
 `last_synced_at` when a user's linked LeetCode username changes, so an old
@@ -275,8 +268,8 @@ public-profile RPC. It returns an explicit public projection, including the
 cached activity calendar and topic counts, only when the profile owner has
 enabled public visibility. It does not expose user IDs, university email,
 LeetCode cache JSON, or private preferences. Apply it after migration 009 and
-before deploying the public-profile endpoint changes; it has not been run
-against the Supabase project.
+before deploying the public-profile endpoint changes. Its analytics fields
+were verified in the live RPC definition on 2026-11-26.
 
 Migration `011_leaderboard_public_statistics.sql` transactionally replaces
 the public leaderboard RPC and adds a partial index for successful cached
@@ -286,17 +279,27 @@ statistics refresh time. It continues excluding private profiles and does not
 expose email, Auth IDs, USNs, or preferences. The RPC joins the one-per-user
 LeetCode statistics row, performs search/filter/sort/pagination in PostgreSQL,
 and does not contact LeetCode. Apply it after 010 and before deploying this
-leaderboard API/UI version. It has not been applied by this change.
+leaderboard API/UI version. Its expected fields were verified in the live RPC
+definition on 2026-11-26.
 
-With the Supabase CLI, run from `Frontend/` after confirming the project link:
+The live migration ledger currently lists only migrations 001–005, while
+schema inspection confirms the expected objects from 006–011 are present.
+Those later migrations appear to have been applied outside the CLI ledger.
+Do not run `supabase db push` against production until the migration history
+has been reconciled with the live schema. Migration 012 is new and has not
+been applied.
+
+Check the linked project's migration ledger from the repository root:
 
 ```bash
 supabase login
 supabase link --project-ref <project-ref>
-supabase db push
+supabase migration list --linked
 ```
 
-Review the CLI's pending migration list before applying it to production.
+Do not run `supabase db push` against production until migrations 006–011 are
+reconciled with the manually applied schema objects. Apply migration 012 only
+after the ledger is corrected and the migration has been reviewed.
 
 ## API smoke tests
 
@@ -399,14 +402,14 @@ to a new build until the staged checks below pass.
 
 ### 2. Vercel frontend setup
 
-`Frontend/vercel.json` configures the Vite production build, `dist` output,
-client-side route fallback, and baseline HTTPS/browser security headers.
+The root `vercel.json` configures the Vite production build output, client-side
+route fallback, and baseline browser security headers.
 
 In Vercel, import the repository and set:
 
 | Setting | Value |
 |---|---|
-| Root Directory | `Frontend` |
+| Root Directory | `.` (repository root) |
 | Framework Preset | Vite |
 | Build Command | `npm run build` |
 | Output Directory | `dist` |
@@ -429,7 +432,7 @@ in Vercel frontend variables. Use Preview variables with staging resources.
 Attach/verify the production custom domain only after staging passes. Confirm
 DNS and TLS in Vercel, then verify both `/` and a direct route such as
 `/u/<public-test-username>` return the app over HTTPS. The rewrite must serve
-`index.html` for SPA routes; Vercel config now provides this fallback.
+`index.html` for SPA routes; the root Vercel config provides this fallback.
 
 ### 3. FastAPI hosting setup
 
@@ -525,30 +528,25 @@ configuration change has been performed by this task.
 
 ### Current verification limits
 
-The local frontend tests, lint, and Vite production build have passed in prior
-checks; the build warns that its main JavaScript chunk exceeds 500 kB. Backend
-automated tests also passed locally. These checks do not prove staging or
-production configuration. Supabase migration/RLS/Auth/SMTP settings, Vercel
-domain, backend host, live OTP delivery, production API, and browser-based
-responsive flows have not been accessed or verified from this workspace.
+The local frontend tests, lint, production build, backend suite, and `/health`
+smoke check have been run. The build warns that the main JavaScript chunk
+exceeds 500 kB. Live Supabase schema/RLS and public leaderboard/profile
+projections were inspected, and two explicitly approved profiles were synced.
+Vercel project access is currently denied, so deployment settings and logs
+could not be inspected. Supabase Auth email delivery through Brevo and browser
+responsive flows were not verified. The live migration ledger lists only
+001–005 although objects from 006–011 exist; reconcile that history before any
+production migration command. Migration 012 is local and unapplied.
 
 ## Verification status and known limitations
 
-The following checks were run for this workspace:
-
-- Frontend tests: passed (analytics, LeetCode provider validation, and 14
-  mocked Auth/session tests).
-- Frontend production build: passed, with a Vite warning that the main
-  JavaScript bundle (556.9 kB minified) exceeds 500 kB.
-- Targeted ESLint checks passed for the changed auth, profile, and LeetCode
-  API service files.
-- Backend unit/route tests: passed (87 tests).
-- In-process API smoke tests: `/health`, `/docs`, `/openapi.json`,
-  `/api/branches`, and localhost CORS preflight returned HTTP 200.
-- Browser-based interaction checks, real Brevo email delivery, live
-  Supabase/RLS behavior, and live LeetCode profile/stat data were not verified
-  in this environment. Migrations 008 and 009 must
-  be applied to the Supabase project before deploying these changes.
+The final local test and build results are recorded in the handoff for this
+workspace. LeetCode integration uses its public GraphQL interface, which is not
+a documented stable API. Optional profile and topic fields may be absent or
+change; valid core counts are retained when optional data is unavailable.
+Cached reads do not call LeetCode; syncs use a server-side lease and do not
+bypass login, CAPTCHAs, or anti-bot controls. A successful build or mocked test
+does not establish production deployment readiness.
 
 LeetCode integration uses its public GraphQL interface, which is not a
 documented stable API. Optional profile and topic fields may be absent or
