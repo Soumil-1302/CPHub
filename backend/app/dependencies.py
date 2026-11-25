@@ -22,6 +22,7 @@ from app.services.supabase_service import (
 
 logger = logging.getLogger("cphub.api.auth")
 bearer_scheme = HTTPBearer(auto_error=False)
+ALLOWED_STUDENT_EMAIL_DOMAIN = "dsu.edu.in"
 
 
 @dataclass(frozen=True)
@@ -144,7 +145,27 @@ def get_current_user(
         raise _unauthorized() from None
 
     user_email = getattr(user, "email", None)
+    confirmed_at = (
+        getattr(user, "email_confirmed_at", None)
+        or getattr(user, "confirmed_at", None)
+    )
+    normalized_email = user_email.strip().casefold() if isinstance(user_email, str) else ""
+    email_local_part, separator, email_domain = normalized_email.rpartition("@")
+    if (
+        not separator
+        or not email_local_part
+        or email_domain != ALLOWED_STUDENT_EMAIL_DOMAIN
+        or not confirmed_at
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "student_email_required",
+                "message": "A verified @dsu.edu.in account is required to use CPHub.",
+            },
+        )
+
     return AuthenticatedUser(
         id=validated_user_id,
-        email=user_email if isinstance(user_email, str) else None,
+        email=user_email,
     )

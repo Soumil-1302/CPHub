@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
 from supabase import Client
 
@@ -8,13 +8,34 @@ from app.dependencies import (
     get_current_user,
     get_supabase_admin_client,
 )
-from app.schemas.leetcode import LeetCodeRefreshResponse, RefreshError
+from app.schemas.leetcode import (
+    LeetCodeAccountResponse,
+    LeetCodeAccountUpdateRequest,
+    LeetCodeActivityResponse,
+    LeetCodeRefreshResponse,
+    LeetCodeSyncStatusResponse,
+    LeetCodeTopicsResponse,
+    RefreshError,
+)
 from app.services.leetcode_service import (
     get_my_cached_leetcode_stats,
+    get_my_leetcode_account,
+    get_my_leetcode_activity,
+    get_my_leetcode_topics,
+    get_my_leetcode_sync_status,
     refresh_my_leetcode_stats,
+    update_my_leetcode_account,
 )
 
 router = APIRouter(prefix="/leetcode", tags=["leetcode"])
+
+
+@router.get("/sync-status", response_model=LeetCodeSyncStatusResponse)
+def get_my_leetcode_sync_status_route(
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    client: Client = Depends(get_supabase_admin_client),
+) -> LeetCodeSyncStatusResponse:
+    return get_my_leetcode_sync_status(client, current_user.id)
 
 
 @router.get(
@@ -26,6 +47,8 @@ router = APIRouter(prefix="/leetcode", tags=["leetcode"])
         503: {"description": "Cached statistics are temporarily unavailable."},
     },
 )
+@router.get("/profile", response_model=LeetCodeRefreshResponse)
+@router.get("/stats", response_model=LeetCodeRefreshResponse)
 def get_my_leetcode_stats(
     current_user: AuthenticatedUser = Depends(get_current_user),
     client: Client = Depends(get_supabase_admin_client),
@@ -33,8 +56,46 @@ def get_my_leetcode_stats(
     return get_my_cached_leetcode_stats(client, current_user.id)
 
 
+@router.get("/activity", response_model=LeetCodeActivityResponse)
+def get_my_leetcode_activity_route(
+    limit: int = Query(default=365, ge=1, le=3660),
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    client: Client = Depends(get_supabase_admin_client),
+) -> LeetCodeActivityResponse:
+    return get_my_leetcode_activity(client, current_user.id, limit)
+
+
+@router.get("/topics", response_model=LeetCodeTopicsResponse)
+def get_my_leetcode_topics_route(
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    client: Client = Depends(get_supabase_admin_client),
+) -> LeetCodeTopicsResponse:
+    return get_my_leetcode_topics(client, current_user.id)
+
+
+@router.get("/account", response_model=LeetCodeAccountResponse)
+def get_my_leetcode_account_route(
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    client: Client = Depends(get_supabase_admin_client),
+) -> LeetCodeAccountResponse:
+    return get_my_leetcode_account(client, current_user.id)
+
+
+@router.put("/account", response_model=LeetCodeAccountResponse)
+def update_my_leetcode_account_route(
+    request: LeetCodeAccountUpdateRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    client: Client = Depends(get_supabase_admin_client),
+) -> LeetCodeAccountResponse:
+    return update_my_leetcode_account(
+        client,
+        current_user.id,
+        request.leetcode_username,
+    )
+
+
 @router.post(
-    "/refresh",
+    "/sync",
     response_model=LeetCodeRefreshResponse,
     responses={
         400: {"model": LeetCodeRefreshResponse},
@@ -43,6 +104,15 @@ def get_my_leetcode_stats(
         502: {"model": LeetCodeRefreshResponse},
         503: {"model": LeetCodeRefreshResponse},
         504: {"model": LeetCodeRefreshResponse},
+    },
+)
+@router.post(
+    "/refresh",
+    response_model=LeetCodeRefreshResponse,
+    responses={
+        400: {"description": "A LeetCode username has not been added to the profile."},
+        401: {"description": "A valid Supabase access token is required."},
+        503: {"description": "Cached statistics are temporarily unavailable."},
     },
 )
 def refresh_leetcode_stats(

@@ -46,7 +46,11 @@ class SupabaseAuthenticationDependencyTests(unittest.TestCase):
             auth=SimpleNamespace(
                 get_user=Mock(
                     return_value=SimpleNamespace(
-                        user=SimpleNamespace(id=str(USER_ID), email="must-not-leak@example.com")
+                        user=SimpleNamespace(
+                            id=str(USER_ID),
+                            email="student@dsu.edu.in",
+                            email_confirmed_at="2026-11-23T00:00:00+00:00",
+                        )
                     )
                 )
             )
@@ -67,13 +71,39 @@ class SupabaseAuthenticationDependencyTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.auth_client.auth.get_user.assert_called_once_with("valid-access-token")
         self.assertNotIn("valid-access-token", response.text)
-        self.assertEqual(response.json()["university_email"], "must-not-leak@example.com")
+        self.assertEqual(response.json()["university_email"], "student@dsu.edu.in")
 
     def test_authenticated_user_id_comes_from_supabase_auth_response(self) -> None:
         user = get_current_user("valid-access-token", Settings())
 
         self.assertEqual(user.id, USER_ID)
         self.auth_client.auth.get_user.assert_called_once_with("valid-access-token")
+
+    def test_university_domain_is_required_for_authenticated_routes(self) -> None:
+        for email, email_confirmed_at in (
+            ("outsider@example.com", "2026-11-23T00:00:00+00:00"),
+            ("student@dsu.edu.in", None),
+        ):
+            with self.subTest(email=email, email_confirmed_at=email_confirmed_at):
+                self.auth_client.auth.get_user.return_value = SimpleNamespace(
+                    user=SimpleNamespace(
+                        id=str(USER_ID),
+                        email=email,
+                        email_confirmed_at=email_confirmed_at,
+                    )
+                )
+
+                response = self.client.get(
+                    "/api/profile/me",
+                    headers={"Authorization": "Bearer valid-access-token"},
+                )
+
+                self.assertEqual(response.status_code, 403)
+                self.assertEqual(
+                    response.json()["error"]["code"],
+                    "student_email_required",
+                )
+                self.assertNotIn(email, response.text)
 
     def test_invalid_bearer_token_is_rejected_without_leaking_token(self) -> None:
         self.auth_client.auth.get_user.side_effect = AuthInvalidJwtError("Invalid JWT")

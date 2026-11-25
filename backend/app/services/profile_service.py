@@ -8,16 +8,18 @@ from supabase import Client
 
 from app.schemas.profile import (
     MyProfileResponse,
-    ProfileCreateRequest,
+    RegistrationDraftResponse,
+    RegistrationProfileRequest,
     ProfileUpdateRequest,
     PublicProfileResponse,
     normalize_profile_username,
 )
+from app.services.leetcode_service import LeetCodeProviderError, validate_leetcode_username
 
 logger = logging.getLogger("cphub.api.profiles")
 PROFILE_COLUMNS = (
-    "id,username,display_name,usn,branch,graduation_year,leetcode_username,"
-    "created_at,updated_at"
+    "id,username,display_name,full_name,university,usn,branch,graduation_year,leetcode_username,"
+    "avatar_url,bio,is_public,created_at,updated_at"
 )
 
 
@@ -91,10 +93,15 @@ def _profile_values(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "username": row["username"],
         "display_name": row.get("display_name") or "",
+        "full_name": row.get("full_name") or row.get("display_name") or "",
+        "university": row.get("university"),
         "usn": row.get("usn"),
         "branch": row.get("branch") or "",
         "year_of_passing": year_of_passing,
         "leetcode_username": leetcode_username or None,
+        "avatar_url": row.get("avatar_url"),
+        "bio": row.get("bio"),
+        "is_public": bool(row.get("is_public", True)),
         "leetcode_profile_url": (
             f"https://leetcode.com/u/{leetcode_username}/" if leetcode_username else None
         ),
@@ -138,35 +145,80 @@ def get_my_profile(
     )
 
 
-def create_profile(
+def get_registration_draft(
+    client: Client,
+    user_id: UUID,
+) -> RegistrationDraftResponse:
+    row = _get_profile_by_id(client, user_id)
+    if row and row.get("username"):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "code": "profile_exists",
+                "message": "Your CPHub profile is already complete.",
+            },
+        )
+
+    raw_year = row.get("graduation_year") if row else None
+    try:
+        year_of_passing = int(raw_year) if raw_year else None
+    except (TypeError, ValueError) as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "code": "invalid_profile_data",
+                "message": "Your saved registration details could not be loaded.",
+            },
+        ) from error
+
+    leetcode_username = str(row.get("leetcode_username") or "").strip() if row else ""
+    return RegistrationDraftResponse(
+        username=row.get("username") if row else None,
+        full_name=(
+            row.get("full_name") or row.get("display_name")
+            if row
+            else None
+        ),
+        university=row.get("university") if row else None,
+        branch=row.get("branch") if row else None,
+        year_of_passing=year_of_passing,
+        leetcode_username=leetcode_username or None,
+        leetcode_profile_url=(
+            f"https://leetcode.com/u/{leetcode_username}/" if leetcode_username else None
+        ),
+    )
+
+
+def complete_registration(
     client: Client,
     user_id: UUID,
     email: str | None,
-    request: ProfileCreateRequest,
+    request: RegistrationProfileRequest,
 ) -> MyProfileResponse:
     try:
         response = client.rpc(
-            "create_or_complete_profile",
+            "complete_registration",
             {
                 "p_user_id": str(user_id),
                 "p_username": request.username,
-                "p_display_name": request.display_name,
+                "p_full_name": request.full_name,
+                "p_university": request.university,
                 "p_branch": request.branch,
-                "p_graduation_year": str(request.year_of_passing),
+                "p_graduation_year": request.year_of_passing,
                 "p_leetcode_username": request.leetcode_username,
             },
         ).execute()
     except Exception as error:
-        _raise_database_error("create", error)
+        _raise_database_error("registration", error)
 
     row = _as_profile_row(response.data)
     if not row:
-        logger.error("Profile creation RPC returned no profile row.")
+        logger.error("Registration RPC returned no profile row.")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
-                "code": "profile_creation_failed",
-                "message": "The profile could not be created.",
+                "code": "registration_failed",
+                "message": "Your registration could not be completed.",
             },
         )
     return MyProfileResponse(
@@ -174,6 +226,37 @@ def create_profile(
         user_id=user_id,
         university_email=email,
     )
+
+
+def validate_leetcode_profile(username: str) -> None:
+    try:
+        validate_leetcode_username(username)
+    except LeetCodeProviderError as error:
+        if error.code == "profile_not_found":
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail={
+                    "code": "leetcode_profile_not_found",
+                    "message": "The LeetCode profile could not be found.",
+                    "details": [{
+                        "location": ["body", "leetcode_username"],
+                        "message": "Enter an existing LeetCode username.",
+                    }],
+                },
+            ) from None
+        logger.info("LeetCode registration validation failed (%s).", error.code)
+        raise HTTPException(
+            status_code=error.status_code,
+            detail={
+                "code": "leetcode_validation_unavailable",
+                "message": "Unable to validate the LeetCode profile right now. Please try again.",
+            },
+            headers=(
+                {"Retry-After": str(error.retry_after_seconds)}
+                if error.retry_after_seconds
+                else None
+            ),
+        ) from None
 
 
 def update_my_profile(
@@ -201,6 +284,10 @@ def update_my_profile(
                 "message": "Provide at least one profile field to update.",
             },
         )
+
+    leetcode_username = updates.get("leetcode_username")
+    if isinstance(leetcode_username, str) and leetcode_username:
+        validate_leetcode_profile(leetcode_username)
 
     try:
         response = (

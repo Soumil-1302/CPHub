@@ -13,7 +13,7 @@ def leaderboard_payload() -> dict:
             {
                 "username": "student_one",
                 "name": "Student One",
-                "usn": "eng25ct0060",
+                "avatar_url": "https://example.test/avatar.png",
                 "branch": "CST",
                 "year": "2028",
                 "leetcode": 12,
@@ -21,7 +21,7 @@ def leaderboard_payload() -> dict:
                 "easy_solved": 4,
                 "medium_solved": 6,
                 "hard_solved": 2,
-                "contest_rating": 1420.5,
+                "global_ranking": 12345,
                 "leetcode_username": "student_handle",
                 "leetcode_profile_url": "https://leetcode.com/u/student_handle/",
                 "fetched_at": "2026-11-23T12:00:00+00:00",
@@ -75,10 +75,13 @@ class LeaderboardRouteTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200, response.text)
         student = response.json()["data"]["students"][0]
         self.assertEqual(student["name"], "Student One")
+        self.assertEqual(student["avatar_url"], "https://example.test/avatar.png")
         self.assertEqual(student["leetcode"], 12)
         self.assertEqual(student["year"], "2028")
+        self.assertEqual(student["global_ranking"], 12345)
         self.assertNotIn("email", student)
         self.assertNotIn("user_id", student)
+        self.assertNotIn("usn", student)
         self.assertEqual(self.db.calls[0][0], "get_public_leaderboard")
         self.assertEqual(self.db.calls[0][1]["p_branches"], None)
 
@@ -107,12 +110,23 @@ class LeaderboardRouteTests(unittest.TestCase):
         self.assertEqual(args["p_offset"], 20)
         self.assertEqual(args["p_search"], "Student")
 
+    def test_supports_each_requested_solve_count_sort(self) -> None:
+        for sort_by in ("total_solved", "easy_solved", "medium_solved", "hard_solved"):
+            with self.subTest(sort_by=sort_by):
+                response = self.client.get(
+                    "/api/leaderboard",
+                    params={"sort_by": sort_by, "sort_order": "asc"},
+                )
+                self.assertEqual(response.status_code, 200, response.text)
+                self.assertEqual(self.db.calls[-1][1]["p_sort_by"], sort_by)
+                self.assertEqual(self.db.calls[-1][1]["p_sort_order"], "asc")
+
     def test_includes_students_without_a_leetcode_handle_or_cached_stats(self) -> None:
         self.db.payload["students"] = [
             {
                 "username": "new_student",
                 "name": "New Student",
-                "usn": None,
+                "avatar_url": None,
                 "branch": "CSE",
                 "year": "2029",
                 "leetcode": 0,
@@ -120,7 +134,7 @@ class LeaderboardRouteTests(unittest.TestCase):
                 "easy_solved": 0,
                 "medium_solved": 0,
                 "hard_solved": 0,
-                "contest_rating": None,
+                "global_ranking": None,
                 "leetcode_username": None,
                 "leetcode_profile_url": None,
                 "fetched_at": None,
@@ -135,7 +149,7 @@ class LeaderboardRouteTests(unittest.TestCase):
         self.assertEqual(student["username"], "new_student")
         self.assertEqual(student["total"], 0)
         self.assertIsNone(student["leetcode_username"])
-        self.assertIsNone(student["contest_rating"])
+        self.assertIsNone(student["global_ranking"])
 
     def test_handles_an_empty_database_result(self) -> None:
         self.db.payload = {
@@ -168,6 +182,7 @@ class LeaderboardRouteTests(unittest.TestCase):
     def test_rejects_invalid_sort_and_pagination_values(self) -> None:
         for params in (
             {"sort_by": "email"},
+            {"sort_by": "name"},
             {"sort_order": "sideways"},
             {"limit": 101},
             {"offset": -1},
@@ -192,6 +207,14 @@ class LeaderboardRouteTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 503)
         self.assertNotIn("student@dsu.edu.in", response.text)
+
+    def test_database_result_does_not_expose_unapproved_student_identifier(self) -> None:
+        self.db.payload["students"][0]["usn"] = "private-serial-number"
+
+        response = self.client.get("/api/leaderboard")
+
+        self.assertEqual(response.status_code, 503)
+        self.assertNotIn("private-serial-number", response.text)
 
 
 if __name__ == "__main__":

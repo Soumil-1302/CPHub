@@ -5,6 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.schemas.leetcode import LeetCodeActivityData, LeetCodeTopicsData
 from app.utils.branch_mapping import normalize_branch
 
 USERNAME_PATTERN = re.compile(r"^[a-z0-9_]{3,30}$")
@@ -60,26 +61,22 @@ def leetcode_username_from_url(value: str | None) -> str:
     return username
 
 
-class ProfileCreateRequest(BaseModel):
+class RegistrationProfileRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     username: str = Field(min_length=3, max_length=30)
-    display_name: str = Field(min_length=1, max_length=100)
+    full_name: str = Field(min_length=1, max_length=100)
+    university: str = Field(min_length=1, max_length=120)
     branch: str = Field(min_length=1, max_length=60)
     year_of_passing: int = Field(ge=1900, le=2200)
-    leetcode_profile_url: str | None = Field(default=None, max_length=512)
-
-    @field_validator("year_of_passing")
-    @classmethod
-    def validate_year(cls, value: int) -> int:
-        return validate_year_of_passing(value)
+    leetcode_username: str = Field(min_length=1, max_length=40)
 
     @field_validator("username")
     @classmethod
     def validate_username(cls, value: str) -> str:
         return normalize_profile_username(value)
 
-    @field_validator("display_name", "branch")
+    @field_validator("full_name", "university", "branch", "leetcode_username")
     @classmethod
     def strip_required_text(cls, value: str) -> str:
         normalized = value.strip()
@@ -87,21 +84,34 @@ class ProfileCreateRequest(BaseModel):
             raise ValueError("This field must not be empty.")
         return normalized
 
+    @field_validator("year_of_passing")
+    @classmethod
+    def validate_year(cls, value: int) -> int:
+        return validate_year_of_passing(value)
+
     @field_validator("branch")
     @classmethod
     def validate_branch(cls, value: str) -> str:
         return normalize_branch(value)
 
-    @field_validator("leetcode_profile_url")
+    @field_validator("leetcode_username")
     @classmethod
-    def validate_leetcode_profile_url(cls, value: str | None) -> str | None:
-        if value is not None:
-            leetcode_username_from_url(value)
-        return value.strip() if value else None
+    def validate_leetcode_username(cls, value: str) -> str:
+        if not LEETCODE_USERNAME_PATTERN.fullmatch(value):
+            raise ValueError(
+                "LeetCode usernames may contain letters, numbers, underscores, and hyphens."
+            )
+        return value
 
-    @property
-    def leetcode_username(self) -> str:
-        return leetcode_username_from_url(self.leetcode_profile_url)
+
+class RegistrationDraftResponse(BaseModel):
+    username: str | None = None
+    full_name: str | None = None
+    university: str | None = None
+    branch: str | None = None
+    year_of_passing: int | None = None
+    leetcode_username: str | None = None
+    leetcode_profile_url: str | None = None
 
 
 class ProfileUpdateRequest(BaseModel):
@@ -109,6 +119,7 @@ class ProfileUpdateRequest(BaseModel):
 
     username: str | None = Field(default=None, min_length=3, max_length=30)
     display_name: str | None = Field(default=None, min_length=1, max_length=100)
+    university: str | None = Field(default=None, min_length=1, max_length=120)
     branch: str | None = Field(default=None, min_length=1, max_length=60)
     year_of_passing: int | None = Field(default=None, ge=1900, le=2200)
     leetcode_profile_url: str | None = Field(default=None, max_length=512)
@@ -123,7 +134,7 @@ class ProfileUpdateRequest(BaseModel):
     def validate_username(cls, value: str | None) -> str | None:
         return normalize_profile_username(value) if value is not None else None
 
-    @field_validator("display_name", "branch")
+    @field_validator("display_name", "university", "branch")
     @classmethod
     def strip_optional_text(cls, value: str | None) -> str | None:
         if value is None:
@@ -157,6 +168,8 @@ class ProfileUpdateRequest(BaseModel):
             raise ValueError("Username cannot be cleared.")
         if "display_name" in fields and fields["display_name"] is None:
             raise ValueError("Display name cannot be cleared.")
+        if "university" in fields and fields["university"] is None:
+            raise ValueError("University cannot be cleared.")
         if "branch" in fields and fields["branch"] is None:
             raise ValueError("Branch cannot be cleared.")
         if "year_of_passing" in fields and fields["year_of_passing"] is None:
@@ -167,6 +180,9 @@ class ProfileUpdateRequest(BaseModel):
             updates["username"] = fields["username"]
         if "display_name" in fields:
             updates["display_name"] = fields["display_name"]
+            updates["full_name"] = fields["display_name"]
+        if "university" in fields:
+            updates["university"] = fields["university"]
         if "branch" in fields:
             updates["branch"] = fields["branch"]
         if "year_of_passing" in fields:
@@ -183,9 +199,13 @@ class PublicProfileResponse(BaseModel):
 
     username: str
     display_name: str
-    usn: str | None = None
+    full_name: str | None = None
+    university: str | None = None
+    avatar_url: str | None = None
+    bio: str | None = None
+    is_public: bool = True
     branch: str
-    year_of_passing: int
+    year_of_passing: int | None = None
     leetcode_username: str | None
     leetcode_profile_url: str | None
     solved_total: int = Field(default=0, ge=0)
@@ -195,10 +215,13 @@ class PublicProfileResponse(BaseModel):
     contest_rating: float | None = Field(default=None, ge=0)
     global_ranking: int | None = Field(default=None, ge=0)
     fetched_at: datetime | None = None
+    activity: LeetCodeActivityData | None = None
+    topics: LeetCodeTopicsData | None = None
     created_at: datetime
     updated_at: datetime
 
 
 class MyProfileResponse(PublicProfileResponse):
+    usn: str | None = None
     user_id: UUID
     university_email: str | None

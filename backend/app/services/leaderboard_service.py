@@ -19,8 +19,6 @@ SortField = Literal[
     "easy_solved",
     "medium_solved",
     "hard_solved",
-    "contest_rating",
-    "name",
 ]
 
 

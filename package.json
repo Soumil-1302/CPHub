@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "test": "node src/utils/studentAnalytics.test.js && node supabase/functions/_shared/leetcodeProvider.test.js && node --test src/services/authService.test.js",
+    "test": "npm --prefix Frontend test",
+    "lint": "npm --prefix Frontend run lint",
     "preview": "vite preview"
   },
   "dependencies": {

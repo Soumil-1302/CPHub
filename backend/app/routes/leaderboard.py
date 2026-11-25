@@ -26,8 +26,6 @@ def get_leaderboard(
         "easy_solved",
         "medium_solved",
         "hard_solved",
-        "contest_rating",
-        "name",
     ] = "total_solved",
     sort_order: Literal["asc", "desc"] = "desc",
     limit: Annotated[int, Query(ge=1, le=100)] = 20,

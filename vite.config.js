@@ -3,7 +3,8 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  root: 'Frontend',
   plugins: [react()],
-  // Load .env files from the repo root (one level up from Frontend/)
+  // Keep the repository root as the shared environment-file location.
   envDir: '..',
 })

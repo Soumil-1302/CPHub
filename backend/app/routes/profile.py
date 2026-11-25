@@ -9,15 +9,18 @@ from app.dependencies import (
 )
 from app.schemas.profile import (
     MyProfileResponse,
-    ProfileCreateRequest,
+    RegistrationDraftResponse,
+    RegistrationProfileRequest,
     ProfileUpdateRequest,
     PublicProfileResponse,
 )
 from app.services.profile_service import (
-    create_profile,
+    complete_registration,
+    get_registration_draft,
     get_my_profile as load_my_profile,
     get_public_profile,
     update_my_profile,
+    validate_leetcode_profile,
 )
 
 router = APIRouter(prefix="/profile", tags=["profiles"])
@@ -36,6 +39,21 @@ def get_my_profile(
     client: Client = Depends(get_supabase_admin_client),
 ) -> MyProfileResponse:
     return load_my_profile(client, current_user.id, current_user.email)
+
+
+@router.get(
+    "/me/registration-draft",
+    response_model=RegistrationDraftResponse,
+    responses={
+        401: {"description": "A valid Supabase access token is required."},
+        409: {"description": "The caller already has a completed profile."},
+    },
+)
+def get_my_registration_draft(
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    client: Client = Depends(get_supabase_admin_client),
+) -> RegistrationDraftResponse:
+    return get_registration_draft(client, current_user.id)
 
 
 @router.get(
@@ -64,11 +82,33 @@ def get_profile(
     },
 )
 def create_my_profile(
-    request: ProfileCreateRequest,
+    request: RegistrationProfileRequest,
     current_user: AuthenticatedUser = Depends(get_current_user),
     client: Client = Depends(get_supabase_admin_client),
 ) -> MyProfileResponse:
-    return create_profile(client, current_user.id, current_user.email, request)
+    get_registration_draft(client, current_user.id)
+    validate_leetcode_profile(request.leetcode_username)
+    return complete_registration(client, current_user.id, current_user.email, request)
+
+
+@router.post(
+    "/registration",
+    response_model=MyProfileResponse,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        401: {"description": "A valid Supabase access token is required."},
+        409: {"description": "The username is taken or registration is already complete."},
+        422: {"description": "Registration input failed validation."},
+    },
+)
+def complete_my_registration(
+    request: RegistrationProfileRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    client: Client = Depends(get_supabase_admin_client),
+) -> MyProfileResponse:
+    get_registration_draft(client, current_user.id)
+    validate_leetcode_profile(request.leetcode_username)
+    return complete_registration(client, current_user.id, current_user.email, request)
 
 
 @router.put(

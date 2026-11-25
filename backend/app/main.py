@@ -10,21 +10,21 @@ from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import get_settings
-from app.routes import branches, leaderboard, leetcode, profile
+from app.routes import auth, branches, dashboard, leaderboard, leetcode, profile, settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("cphub.api")
 
-settings = get_settings()
+app_settings = get_settings()
 app = FastAPI(
-    title=settings.app_name,
+    title=app_settings.app_name,
     description="Backend API foundation for CPHub.",
     version="0.1.0",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=app_settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -133,8 +133,11 @@ async def unhandled_exception_handler(
 
 
 app.include_router(profile.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
+app.include_router(dashboard.router, prefix="/api")
 app.include_router(leaderboard.router, prefix="/api")
 app.include_router(leetcode.router, prefix="/api")
+app.include_router(settings.router, prefix="/api")
 app.include_router(branches.router, prefix="/api")
 
 

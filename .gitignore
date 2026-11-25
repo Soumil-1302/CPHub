@@ -1,4 +1,9 @@
-<<<<<<< HEAD
+# Environment and secret files
+.env
+.env.*
+!.env.example
+!.env.*.example
+
 # Logs
 logs
 *.log
@@ -8,10 +13,19 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies and build output
 node_modules
 dist
 dist-ssr
 *.local
+.venv
+venv
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
 # Editor directories and files
 .vscode/*
@@ -23,6 +37,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-=======
-.env.local
->>>>>>> 3d3d96e (chore: add .env.local to gitignore and remove DS_Store)
